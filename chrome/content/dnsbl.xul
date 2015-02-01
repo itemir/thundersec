@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://dnsbl/locale/overlay.dtd">
+<overlay id="dnsbl-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="chrome://dnsbl/content/dnsbl.js"/>
+   <statusbar id="status-bar">
+       <statusbarpanel id="rblInfo" label=""/>
+       <image id='imgSpinner' src='chrome://dnsbl/content/images/spinner.gif' hidden='true'/>
+   </statusbar>
+</overlay>

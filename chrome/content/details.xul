@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<dialog title="Details" orient="vertical" autostretch="always" onload="updateDetails();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/javascript" src="chrome://dnsbl/content/details.js"/>
+  <groupbox id='containerBox' align="center" orient="horizontal">
+  </groupbox>
+</dialog>

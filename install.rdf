@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+    <Description about="urn:mozilla:install-manifest">
+        <em:type>2</em:type> <!-- 2 : Extension -->
+        <em:id>dnsbl@community</em:id>
+        <em:version>0.1</em:version>
+        <em:name>DNSBL/RBL Support</em:name>
+        <em:description>Provides client based support to add DNSBL and RBL services to Mozilla Thunderbird. 
+
+Can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones. </em:description>
+        <em:iconURL>chrome://dnsbl/content/images/dnsbl.png</em:iconURL>
+        <em:homepageURL>https://github.com/itemir/thunderbird-dnsbl</em:homepageURL>
+        <em:creator>Ilker Temir and Tim Sammut</em:creator>
+        <em:targetApplication>
+            <Description>
+                <!-- Thunderbird -->
+                <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
+                <em:minVersion>31.0</em:minVersion>
+                <em:maxVersion>39.0</em:maxVersion>
+            </Description>
+        </em:targetApplication>
+        <em:optionsURL>chrome://dnsbl/content/options.xul</em:optionsURL>
+        <em:aboutURL>chrome://dnsbl/content/about.xul</em:aboutURL>
+    </Description>
+</RDF>

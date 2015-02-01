@@ -1,0 +1,8 @@
+<!ENTITY dnsbl.label "Your localized menuitem">
+<!ENTITY dnsblContext.label "Your Menuitem">
+<!ENTITY dnsblContext.accesskey "Y">
+<!ENTITY dnsblToolbarButton.label "Your Toolbar Button">
+<!ENTITY dnsblToolbarButton.tooltip "This is your toolbar button!">
+<!ENTITY dnsblSidebar.label "Your Sidebar">
+<!ENTITY dnsblToolbar.name  "example">
+<!ENTITY dnsblToolbar.label "This is an example toolbar. You can hide it under View &gt; toolbars &gt; &dnsblToolbar.name;">
