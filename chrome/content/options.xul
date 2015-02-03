@@ -7,79 +7,11 @@
     <preferences>
       <preference id="zen.spamhaus.org" name="extensions.dnsbl.zen.spamhaus.org" type="bool"/>
       <preference id="b.barracudacentral.org" name="extensions.dnsbl.b.barracudacentral.org" type="bool"/>
-      <preference id="bl.deadbeef.com" name="extensions.dnsbl.bl.deadbeef.com" type="bool"/>
-      <preference id="bl.emailbasura.org" name="extensions.dnsbl.bl.emailbasura.org" type="bool"/>
-      <preference id="bl.spamcannibal.org" name="extensions.dnsbl.bl.spamcannibal.org" type="bool"/>
-      <preference id="bl.spamcop.net" name="extensions.dnsbl.bl.spamcop.net" type="bool"/>
-      <preference id="blackholes.five-ten-sg.com" name="extensions.dnsbl.blackholes.five-ten-sg.com" type="bool"/>
-      <preference id="blacklist.woody.ch" name="extensions.dnsbl.blacklist.woody.ch" type="bool"/>
-      <preference id="bogons.cymru.com" name="extensions.dnsbl.bogons.cymru.com" type="bool"/>
+      <preference id="dnsbl.abuse.ch" name="extensions.dnsbl.dnsbl.abuse.ch" type="bool"/>
       <preference id="cbl.abuseat.org" name="extensions.dnsbl.cbl.abuseat.org" type="bool"/>
-      <preference id="cdl.anti-spam.org.cn" name="extensions.dnsbl.cdl.anti-spam.org.cn" type="bool"/>
-      <preference id="combined.abuse.ch" name="extensions.dnsbl.combined.abuse.ch" type="bool"/>
-      <preference id="combined.rbl.msrbl.net" name="extensions.dnsbl.combined.rbl.msrbl.net" type="bool"/>
-      <preference id="db.wpbl.info" name="extensions.dnsbl.db.wpbl.info" type="bool"/>
-      <preference id="dnsbl-1.uceprotect.net" name="extensions.dnsbl.dnsbl-1.uceprotect.net" type="bool"/>
-      <preference id="dnsbl-2.uceprotect.net" name="extensions.dnsbl.dnsbl-2.uceprotect.net" type="bool"/>
-      <preference id="dnsbl-3.uceprotect.net" name="extensions.dnsbl.dnsbl-3.uceprotect.net" type="bool"/>
-      <preference id="dnsbl.cyberlogic.net" name="extensions.dnsbl.dnsbl.cyberlogic.net" type="bool"/>
-      <preference id="dnsbl.inps.de" name="extensions.dnsbl.dnsbl.inps.de" type="bool"/>
-      <preference id="dnsbl.njabl.org" name="extensions.dnsbl.dnsbl.njabl.org" type="bool"/>
-      <preference id="dnsbl.sorbs.net" name="extensions.dnsbl.dnsbl.sorbs.net" type="bool"/>
-      <preference id="drone.abuse.ch" name="extensions.dnsbl.drone.abuse.ch" type="bool"/>
-      <preference id="drone.abuse.ch" name="extensions.dnsbl.drone.abuse.ch" type="bool"/>
-      <preference id="duinv.aupads.org" name="extensions.dnsbl.duinv.aupads.org" type="bool"/>
-      <preference id="dul.dnsbl.sorbs.net" name="extensions.dnsbl.dul.dnsbl.sorbs.net" type="bool"/>
-      <preference id="dul.ru" name="extensions.dnsbl.dul.ru" type="bool"/>
-      <preference id="dyna.spamrats.com" name="extensions.dnsbl.dyna.spamrats.com" type="bool"/>
-      <preference id="dynip.rothen.com" name="extensions.dnsbl.dynip.rothen.com" type="bool"/>
-      <preference id="http.dnsbl.sorbs.net" name="extensions.dnsbl.http.dnsbl.sorbs.net" type="bool"/>
-      <preference id="images.rbl.msrbl.net" name="extensions.dnsbl.images.rbl.msrbl.net" type="bool"/>
-      <preference id="ips.backscatterer.org" name="extensions.dnsbl.ips.backscatterer.org" type="bool"/>
-      <preference id="ix.dnsbl.manitu.net" name="extensions.dnsbl.ix.dnsbl.manitu.net" type="bool"/>
-      <preference id="korea.services.net" name="extensions.dnsbl.korea.services.net" type="bool"/>
-      <preference id="misc.dnsbl.sorbs.net" name="extensions.dnsbl.misc.dnsbl.sorbs.net" type="bool"/>
-      <preference id="noptr.spamrats.com" name="extensions.dnsbl.noptr.spamrats.com" type="bool"/>
-      <preference id="ohps.dnsbl.net.au" name="extensions.dnsbl.ohps.dnsbl.net.au" type="bool"/>
-      <preference id="omrs.dnsbl.net.au" name="extensions.dnsbl.omrs.dnsbl.net.au" type="bool"/>
-      <preference id="orvedb.aupads.org" name="extensions.dnsbl.orvedb.aupads.org" type="bool"/>
-      <preference id="osps.dnsbl.net.au" name="extensions.dnsbl.osps.dnsbl.net.au" type="bool"/>
-      <preference id="osrs.dnsbl.net.au" name="extensions.dnsbl.osrs.dnsbl.net.au" type="bool"/>
-      <preference id="owfs.dnsbl.net.au" name="extensions.dnsbl.owfs.dnsbl.net.au" type="bool"/>
-      <preference id="owps.dnsbl.net.au" name="extensions.dnsbl.owps.dnsbl.net.au" type="bool"/>
-      <preference id="phishing.rbl.msrbl.net" name="extensions.dnsbl.phishing.rbl.msrbl.net" type="bool"/>
-      <preference id="probes.dnsbl.net.au" name="extensions.dnsbl.probes.dnsbl.net.au" type="bool"/>
-      <preference id="proxy.bl.gweep.ca" name="extensions.dnsbl.proxy.bl.gweep.ca" type="bool"/>
-      <preference id="proxy.block.transip.nl" name="extensions.dnsbl.proxy.block.transip.nl" type="bool"/>
-      <preference id="psbl.surriel.com" name="extensions.dnsbl.psbl.surriel.com" type="bool"/>
-      <preference id="rbl.interserver.net" name="extensions.dnsbl.rbl.interserver.net" type="bool"/>
-      <preference id="rbl.megarbl.net" name="extensions.dnsbl.rbl.megarbl.net" type="bool"/>
-      <preference id="rdts.dnsbl.net.au" name="extensions.dnsbl.rdts.dnsbl.net.au" type="bool"/>
-      <preference id="relays.bl.gweep.ca" name="extensions.dnsbl.relays.bl.gweep.ca" type="bool"/>
-      <preference id="relays.nether.net" name="extensions.dnsbl.relays.nether.net" type="bool"/>
-      <preference id="residential.block.transip.nl" name="extensions.dnsbl.residential.block.transip.nl" type="bool"/>
-      <preference id="ricn.dnsbl.net.au" name="extensions.dnsbl.ricn.dnsbl.net.au" type="bool"/>
-      <preference id="rmst.dnsbl.net.au" name="extensions.dnsbl.rmst.dnsbl.net.au" type="bool"/>
-      <preference id="short.rbl.jp" name="extensions.dnsbl.short.rbl.jp" type="bool"/>
-      <preference id="smtp.dnsbl.sorbs.net" name="extensions.dnsbl.smtp.dnsbl.sorbs.net" type="bool"/>
-      <preference id="socks.dnsbl.sorbs.net" name="extensions.dnsbl.socks.dnsbl.sorbs.net" type="bool"/>
-      <preference id="spam.abuse.ch" name="extensions.dnsbl.spam.abuse.ch" type="bool"/>
-      <preference id="spam.dnsbl.sorbs.net" name="extensions.dnsbl.spam.dnsbl.sorbs.net" type="bool"/>
-      <preference id="spam.rbl.msrbl.net" name="extensions.dnsbl.spam.rbl.msrbl.net" type="bool"/>
-      <preference id="spam.spamrats.com" name="extensions.dnsbl.spam.spamrats.com" type="bool"/>
-      <preference id="spamlist.or.kr" name="extensions.dnsbl.spamlist.or.kr" type="bool"/>
-      <preference id="spamrbl.imp.ch" name="extensions.dnsbl.spamrbl.imp.ch" type="bool"/>
-      <preference id="t3direct.dnsbl.net.au" name="extensions.dnsbl.t3direct.dnsbl.net.au" type="bool"/>
-      <preference id="tor.dnsbl.sectoor.de" name="extensions.dnsbl.tor.dnsbl.sectoor.de" type="bool"/>
-      <preference id="torserver.tor.dnsbl.sectoor.de" name="extensions.dnsbl.torserver.tor.dnsbl.sectoor.de" type="bool"/>
-      <preference id="ubl.lashback.com" name="extensions.dnsbl.ubl.lashback.com" type="bool"/>
       <preference id="ubl.unsubscore.com" name="extensions.dnsbl.ubl.unsubscore.com" type="bool"/>
-      <preference id="virbl.bit.nl" name="extensions.dnsbl.virbl.bit.nl" type="bool"/>
-      <preference id="virus.rbl.jp" name="extensions.dnsbl.virus.rbl.jp" type="bool"/>
-      <preference id="virus.rbl.msrbl.net" name="extensions.dnsbl.virus.rbl.msrbl.net" type="bool"/>
-      <preference id="web.dnsbl.sorbs.net" name="extensions.dnsbl.web.dnsbl.sorbs.net" type="bool"/>
-      <preference id="wormrbl.imp.ch" name="extensions.dnsbl.wormrbl.imp.ch" type="bool"/>
-      <preference id="zombie.dnsbl.sorbs.net" name="extensions.dnsbl.zombie.dnsbl.sorbs.net" type="bool"/>
+      <preference id="bl.spamcop.net" name="extensions.dnsbl.bl.spamcop.net" type="bool"/>
+      <preference id="dnsbl.sorbs.net" name="extensions.dnsbl.dnsbl.sorbs.net" type="bool"/>
       <preference id="custom_rbl_enabled" name="extensions.dnsbl.custom_rbl_enabled" type="bool"/>
       <preference id="custom_rbl" name="extensions.dnsbl.custom_rbl" type="string"/>
     </preferences>
@@ -87,90 +19,25 @@
     <separator class="thin"/>
     <hbox>
       <vbox>
-        <checkbox id="checkbool.b.barracudacentral.org" preference="b.barracudacentral.org" label="b.barracudacentral.org" />
-        <checkbox id="checkbool.bl.deadbeef.com" preference="bl.deadbeef.com" label="bl.deadbeef.com" />
-        <checkbox id="checkbool.bl.emailbasura.org" preference="bl.emailbasura.org" label="bl.emailbasura.org" />
-        <checkbox id="checkbool.bl.spamcannibal.org" preference="bl.spamcannibal.org" label="bl.spamcannibal.org" />
-        <checkbox id="checkbool.bl.spamcop.net" preference="bl.spamcop.net" label="bl.spamcop.net" />
-        <checkbox id="checkbool.blackholes.five-ten-sg.com" preference="blackholes.five-ten-sg.com" label="blackholes.five-ten-sg.com" />
-        <checkbox id="checkbool.blacklist.woody.ch" preference="blacklist.woody.ch" label="blacklist.woody.ch" />
-        <checkbox id="checkbool.bogons.cymru.com" preference="bogons.cymru.com" label="bogons.cymru.com" />
-        <checkbox id="checkbool.cbl.abuseat.org" preference="cbl.abuseat.org" label="cbl.abuseat.org" />
-        <checkbox id="checkbool.cdl.anti-spam.org.cn" preference="cdl.anti-spam.org.cn" label="cdl.anti-spam.org.cn" />
-        <checkbox id="checkbool.combined.abuse.ch" preference="combined.abuse.ch" label="combined.abuse.ch" />
-        <checkbox id="checkbool.combined.rbl.msrbl.net" preference="combined.rbl.msrbl.net" label="combined.rbl.msrbl.net" />
-        <checkbox id="checkbool.db.wpbl.info" preference="db.wpbl.info" label="db.wpbl.info" />
-        <checkbox id="checkbool.dnsbl-1.uceprotect.net" preference="dnsbl-1.uceprotect.net" label="dnsbl-1.uceprotect.net" />
-        <checkbox id="checkbool.dnsbl-2.uceprotect.net" preference="dnsbl-2.uceprotect.net" label="dnsbl-2.uceprotect.net" />
-        <checkbox id="checkbool.dnsbl-3.uceprotect.net" preference="dnsbl-3.uceprotect.net" label="dnsbl-3.uceprotect.net" />
-        <checkbox id="checkbool.dnsbl.cyberlogic.net" preference="dnsbl.cyberlogic.net" label="dnsbl.cyberlogic.net" />
-        <checkbox id="checkbool.dnsbl.inps.de" preference="dnsbl.inps.de" label="dnsbl.inps.de" />
-        <checkbox id="checkbool.dnsbl.njabl.org" preference="dnsbl.njabl.org" label="dnsbl.njabl.org" />
-      </vbox>
-      <vbox>
-        <checkbox id="checkbool.dnsbl.sorbs.net" preference="dnsbl.sorbs.net" label="dnsbl.sorbs.net" />
-        <checkbox id="checkbool.drone.abuse.ch" preference="drone.abuse.ch" label="drone.abuse.ch" />
-        <checkbox id="checkbool.drone.abuse.ch" preference="drone.abuse.ch" label="drone.abuse.ch" />
-        <checkbox id="checkbool.duinv.aupads.org" preference="duinv.aupads.org" label="duinv.aupads.org" />
-        <checkbox id="checkbool.dul.dnsbl.sorbs.net" preference="dul.dnsbl.sorbs.net" label="dul.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.dul.ru" preference="dul.ru" label="dul.ru" />
-        <checkbox id="checkbool.dyna.spamrats.com" preference="dyna.spamrats.com" label="dyna.spamrats.com" />
-        <checkbox id="checkbool.dynip.rothen.com" preference="dynip.rothen.com" label="dynip.rothen.com" />
-        <checkbox id="checkbool.http.dnsbl.sorbs.net" preference="http.dnsbl.sorbs.net" label="http.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.images.rbl.msrbl.net" preference="images.rbl.msrbl.net" label="images.rbl.msrbl.net" />
-        <checkbox id="checkbool.ips.backscatterer.org" preference="ips.backscatterer.org" label="ips.backscatterer.org" />
-        <checkbox id="checkbool.ix.dnsbl.manitu.net" preference="ix.dnsbl.manitu.net" label="ix.dnsbl.manitu.net" />
-        <checkbox id="checkbool.korea.services.net" preference="korea.services.net" label="korea.services.net" />
-        <checkbox id="checkbool.misc.dnsbl.sorbs.net" preference="misc.dnsbl.sorbs.net" label="misc.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.noptr.spamrats.com" preference="noptr.spamrats.com" label="noptr.spamrats.com" />
-        <checkbox id="checkbool.ohps.dnsbl.net.au" preference="ohps.dnsbl.net.au" label="ohps.dnsbl.net.au" />
-        <checkbox id="checkbool.omrs.dnsbl.net.au" preference="omrs.dnsbl.net.au" label="omrs.dnsbl.net.au" />
-        <checkbox id="checkbool.orvedb.aupads.org" preference="orvedb.aupads.org" label="orvedb.aupads.org" />
-        <checkbox id="checkbool.osps.dnsbl.net.au" preference="osps.dnsbl.net.au" label="osps.dnsbl.net.au" />
-      </vbox>
-      <vbox>
-        <checkbox id="checkbool.osrs.dnsbl.net.au" preference="osrs.dnsbl.net.au" label="osrs.dnsbl.net.au" />
-        <checkbox id="checkbool.owfs.dnsbl.net.au" preference="owfs.dnsbl.net.au" label="owfs.dnsbl.net.au" />
-        <checkbox id="checkbool.owps.dnsbl.net.au" preference="owps.dnsbl.net.au" label="owps.dnsbl.net.au" />
-        <checkbox id="checkbool.phishing.rbl.msrbl.net" preference="phishing.rbl.msrbl.net" label="phishing.rbl.msrbl.net" />
-        <checkbox id="checkbool.probes.dnsbl.net.au" preference="probes.dnsbl.net.au" label="probes.dnsbl.net.au" />
-        <checkbox id="checkbool.proxy.bl.gweep.ca" preference="proxy.bl.gweep.ca" label="proxy.bl.gweep.ca" />
-        <checkbox id="checkbool.proxy.block.transip.nl" preference="proxy.block.transip.nl" label="proxy.block.transip.nl" />
-        <checkbox id="checkbool.psbl.surriel.com" preference="psbl.surriel.com" label="psbl.surriel.com" />
-        <checkbox id="checkbool.rbl.interserver.net" preference="rbl.interserver.net" label="rbl.interserver.net" />
-        <checkbox id="checkbool.rbl.megarbl.net" preference="rbl.megarbl.net" label="rbl.megarbl.net" />
-        <checkbox id="checkbool.rdts.dnsbl.net.au" preference="rdts.dnsbl.net.au" label="rdts.dnsbl.net.au" />
-        <checkbox id="checkbool.relays.bl.gweep.ca" preference="relays.bl.gweep.ca" label="relays.bl.gweep.ca" />
-        <checkbox id="checkbool.relays.nether.net" preference="relays.nether.net" label="relays.nether.net" />
-        <checkbox id="checkbool.residential.block.transip.nl" preference="residential.block.transip.nl" label="residential.block.transip.nl" />
-        <checkbox id="checkbool.ricn.dnsbl.net.au" preference="ricn.dnsbl.net.au" label="ricn.dnsbl.net.au" />
-        <checkbox id="checkbool.rmst.dnsbl.net.au" preference="rmst.dnsbl.net.au" label="rmst.dnsbl.net.au" />
-        <checkbox id="checkbool.short.rbl.jp" preference="short.rbl.jp" label="short.rbl.jp" />
-        <checkbox id="checkbool.smtp.dnsbl.sorbs.net" preference="smtp.dnsbl.sorbs.net" label="smtp.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.socks.dnsbl.sorbs.net" preference="socks.dnsbl.sorbs.net" label="socks.dnsbl.sorbs.net" />
-      </vbox>
-      <vbox>
-        <checkbox id="checkbool.spam.abuse.ch" preference="spam.abuse.ch" label="spam.abuse.ch" />
-        <checkbox id="checkbool.spam.dnsbl.sorbs.net" preference="spam.dnsbl.sorbs.net" label="spam.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.spam.rbl.msrbl.net" preference="spam.rbl.msrbl.net" label="spam.rbl.msrbl.net" />
-        <checkbox id="checkbool.spam.spamrats.com" preference="spam.spamrats.com" label="spam.spamrats.com" />
-        <checkbox id="checkbool.spamlist.or.kr" preference="spamlist.or.kr" label="spamlist.or.kr" />
-        <checkbox id="checkbool.spamrbl.imp.ch" preference="spamrbl.imp.ch" label="spamrbl.imp.ch" />
-        <checkbox id="checkbool.t3direct.dnsbl.net.au" preference="t3direct.dnsbl.net.au" label="t3direct.dnsbl.net.au" />
-        <checkbox id="checkbool.tor.dnsbl.sectoor.de" preference="tor.dnsbl.sectoor.de" label="tor.dnsbl.sectoor.de" />
-        <checkbox id="checkbool.torserver.tor.dnsbl.sectoor.de" preference="torserver.tor.dnsbl.sectoor.de" label="torserver.tor.dnsbl.sectoor.de" />
-        <checkbox id="checkbool.ubl.lashback.com" preference="ubl.lashback.com" label="ubl.lashback.com" />
-        <checkbox id="checkbool.ubl.unsubscore.com" preference="ubl.unsubscore.com" label="ubl.unsubscore.com" />
-        <checkbox id="checkbool.virbl.bit.nl" preference="virbl.bit.nl" label="virbl.bit.nl" />
-        <checkbox id="checkbool.virus.rbl.jp" preference="virus.rbl.jp" label="virus.rbl.jp" />
-        <checkbox id="checkbool.virus.rbl.msrbl.net" preference="virus.rbl.msrbl.net" label="virus.rbl.msrbl.net" />
-        <checkbox id="checkbool.web.dnsbl.sorbs.net" preference="web.dnsbl.sorbs.net" label="web.dnsbl.sorbs.net" />
-        <checkbox id="checkbool.wormrbl.imp.ch" preference="wormrbl.imp.ch" label="wormrbl.imp.ch" />
         <checkbox id="checkbool.zen.spamhaus.org" preference="zen.spamhaus.org" label="zen.spamhaus.org" />
-        <checkbox id="checkbool.zombie.dnsbl.sorbs.net" preference="zombie.dnsbl.sorbs.net" label="zombie.dnsbl.sorbs.net" />
+        <checkbox id="checkbool.b.barracudacentral.org" preference="b.barracudacentral.org" label="b.barracudacentral.org" />
+        <checkbox id="checkbool.dnsbl.abuse.ch" preference="dnsbl.abuse.ch" label="dnsbl.abuse.ch" />
+        <checkbox id="checkbool.cbl.abuseat.org" preference="cbl.abuseat.org" label="cbl.abuseat.org" />
+      </vbox>
+      <vbox>
+        <checkbox id="checkbool.ubl.unsubscore.com" preference="ubl.unsubscore.com" label="ubl.unsubscore.com" />
+        <checkbox id="checkbool.bl.spamcop.net" preference="bl.spamcop.net" label="bl.spamcop.net" />
+        <checkbox id="checkbool.dnsbl.sorbs.net" preference="dnsbl.sorbs.net" label="dnsbl.sorbs.net" />
         <hbox>
-           <checkbox id="checkbool.custom_rbl_enabled" preference="custom_rbl_enabled" label="" />
+           <checkbox id="checkbool.custom_rbl_enabled" preference="custom_rbl_enabled" label="" onclick="enableCustomRBL(this);" />
            <textbox id="string.custom_rbl" preference="custom_rbl" onclick="clearInput();"/>
+           <script>
+               if ( document.getElementById("checkbool.custom_rbl_enabled").checked ) {
+                   document.getElementById("string.custom_rbl").removeAttribute("disabled");
+               } else {
+                   document.getElementById("string.custom_rbl").setAttribute("disabled", true);
+               }
+           </script>
         </hbox>
     </vbox>
     </hbox>

@@ -24,7 +24,7 @@ function updateDetails() {
    var ipLink;
    var codeLink;
 
-   var html = "<div style='text-align: center; padding: 20px;'>";
+   var html = "<div style='text-align: center; padding: 20px; -moz-user-select: text;'>";
    html = html + "IP addresses found in RBL databases";
    html = html + "<table style='width: 400px; padding-top: 10px;'>";
    html = html + "<tr><td style='font-weight: bold;'>IP Address</td><td style='font-weight: bold;'>Return Code</td><td style='font-weight: bold;'>Service</td></tr>";

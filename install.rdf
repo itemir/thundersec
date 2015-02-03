@@ -6,9 +6,7 @@
         <em:id>dnsbl@community</em:id>
         <em:version>0.1</em:version>
         <em:name>DNSBL/RBL Support</em:name>
-        <em:description>Provides client based support to add DNSBL and RBL services to Mozilla Thunderbird. 
-
-Can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones. </em:description>
+        <em:description>Provides client based support to add DNSBL and RBL services to Mozilla Thunderbird. Can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
         <em:iconURL>chrome://dnsbl/content/images/dnsbl.png</em:iconURL>
         <em:homepageURL>https://github.com/itemir/thunderbird-dnsbl</em:homepageURL>
         <em:creator>Ilker Temir and Tim Sammut</em:creator>
