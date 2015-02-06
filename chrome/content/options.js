@@ -39,3 +39,31 @@ function enableCustomRBL(item) {
        document.getElementById("string.custom_rbl").removeAttribute("disabled");
    } 
 }
+
+// Brings in whitelist popup
+function viewWhitelist() {
+    var features = "chrome, dialog, centerscreen, scrollbars, width=700, height=500";
+    window.openDialog("chrome://dnsbl/content/whitelist.xul", "Whitelist", features);
+}
+
+// Clears the whitelist
+function clearWhitelist() {
+  if ( window.confirm ('Your whitelist will be cleared. Are you sure?') ){
+      Components.utils.import("resource://gre/modules/Sqlite.jsm");
+      Sqlite.openConnection(
+          { path: "dnsbl.sqlite" }
+      ).then(
+          function onConnection(conn) {
+             conn.tableExists("WhiteList").then(
+                 function (exists) {
+                     conn.execute ("DELETE FROM WhiteList;");
+                     conn.close();
+                 }
+             );
+          }, // on Connection
+          function onError(error) {
+              alert (error);
+          }
+      );
+  }
+}

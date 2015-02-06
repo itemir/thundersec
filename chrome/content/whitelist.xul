@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<dialog title="Whitelist" orient="vertical" autostretch="always" onload="viewWhitelist();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/javascript" src="chrome://dnsbl/content/whitelist.js"/>
+  <script src="chrome://dnsbl/content/jquery-1.11.2.min.js" />
+  <div id='whitelistBox' align="center" orient="horizontal" overflow="auto">
+  </div>
+</dialog>

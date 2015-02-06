@@ -11,5 +11,5 @@ pref("extensions.dnsbl.dnsbl.sorbs.net", false);
 pref("extensions.dnsbl.custom_rbl_enabled", false);
 pref("extensions.dnsbl.custom_rbl", "dnsbl.example.com");
 
-// https://developer.mozilla.org/en/Localizing_extension_descriptions
-//pref("extensions.dnsbl@community.description", "chrome://dnsbl/locale/overlay.properties");
+// Advanced settings
+pref("extensions.dnsbl.api_enabled", true);

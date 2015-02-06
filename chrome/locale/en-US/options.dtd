@@ -1,5 +1,5 @@
-<!ENTITY prefwindow.title "DNSBL &amp;amp;amp;amp;amp;amp;amp;amp;amp; RBL preferences">
-<!ENTITY pane1.title "DNSBL &amp;amp;amp;amp;amp;amp;amp;amp;amp; RBL preferences">
+<!ENTITY prefwindow.title "DNSBL and RBL preferences">
+<!ENTITY pane1.title "DNSBL and RBL preferences">
 <!ENTITY checkboolpref.label "A Boolean Preference">
 <!ENTITY checkboolpref.accesskey "B">
 <!ENTITY intpref.label "An Integer Preference">

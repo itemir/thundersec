@@ -21,11 +21,41 @@
 var RBLNotes = {};
 var totalDNSlookups = {};
 var currentMailID;
+var connection;
 
-var messagepane = document.getElementById("messagepane");
-messagepane.addEventListener('load', function () {
-  pluginMain();
-}, true);
+initialize();
+
+function initialize() {
+    // Add event listener
+    var messagepane = document.getElementById("messagepane");
+    messagepane.addEventListener('load', function () {
+      pluginMain();
+    }, true);
+
+  
+    if (!connection) {
+        Components.utils.import("resource://gre/modules/Sqlite.jsm");
+        Sqlite.openConnection(
+            { path: "dnsbl.sqlite" }
+        ).then(
+            function onConnection(conn) {
+               conn.tableExists("WhiteList").then(
+                   function (exists) {
+                       if (!exists) {
+                           // This means, database has just been created. Create the table.
+                           createTable (conn);
+                       }
+                       // Set the global variable
+                       connection = conn;
+                   }
+               ); 
+            }, // on Connection
+            function onError(error) {
+                alert (error);
+            }
+        );
+    } // if (!connection)
+}
 
 function IPnumber(IPaddress) {
     var ip = IPaddress.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
@@ -97,6 +127,64 @@ function parseReceivedLine (receivedLine) {
    return addr;
 }
 
+function createTable(connection) {
+    var sql = 
+    sql = " CREATE TABLE 'WhiteList' ( " +
+          "       'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+    	  "	  'ipAddress'	TEXT NOT NULL," +
+	  " 	  'dnsblSource'	TEXT NOT NULL," +
+	  " 	  'code'	TEXT NOT NULL," +
+	  "	  'sender'	TEXT NOT NULL," +
+          "       UNIQUE(ipAddress, dnsblSource, code, sender) ); ";
+
+    connection.execute (sql);
+}
+
+function updateWhiteList(rblNotes) {
+    connection.execute("BEGIN IMMEDIATE TRANSACTION");
+    for (var i in rblNotes) {
+        let rblNote = rblNotes[i];
+        let values = [ rblNote.ip,
+                       rblNote.service, 
+                       rblNote.code,
+                       rblNote.sender ];
+        let sql = "INSERT OR IGNORE INTO WhiteList " +
+                  "('ipAddress', 'dnsblSource', 'code', 'sender') " +
+                  "VALUES (?, ?, ?, ?)";
+        connection.execute(sql, values);
+
+        // Notify the API for crowd-sourced improvements
+        var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                         .getService(Components.interfaces.nsIPrefService)
+                         .getBranch("extensions.dnsbl.");
+
+        // Check if API usage is allowed in preferences
+        if ( pref.getBoolPref('api_enabled') ) {
+            // We will hash the sender for privacy
+            // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+            $.post('https://www.ilkertemir.com/dnsbl/api/v1/add', 
+                   { 'ip': rblNote.ip,
+                     'code': rblNote.code,
+                     'dnsbl': rblNote.service,
+                     'senderHash': Sha256.hash (rblNote.sender) } );
+        }
+    }
+    connection.execute("COMMIT TRANSACTION");
+}
+
+function markAsLegitimate(notf, desc) {
+    var confirm = window.confirm ("Are you sure to mark this e-mail as legitimate?\n\n" + 
+                                  "This will be remembered and similar messages from " +
+                                  "this user will no longer be marked for the same " +
+                                  "reason in the future.");
+    if (confirm) {
+        // We need to pass the RBLNotes here, otherwise it will be reset before the database is processed
+        updateWhiteList( RBLNotes[currentMailID] );
+    } else {
+        throw new Error('Preventing notification bar from closing.'); 
+    }
+}
+
 function detailsBox(notf, desc) {
     var params = { notes: RBLNotes[currentMailID] };
     window.openDialog("chrome://dnsbl/content/details.xul", "", "chrome, dialog, centerscreen, resizable=no", params);
@@ -106,12 +194,6 @@ function detailsBox(notf, desc) {
 function optionsBox(notf, desc) {
     var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
     window.openDialog("chrome://dnsbl/content/options.xul", "Preferences", features);
-    throw new Error('Preventing notification bar from closing.');
-}
-
-function aboutBox(notf, desc) {
-    var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
-    window.openDialog("chrome://dnsbl/content/about.xul", "Preferences", features);
     throw new Error('Preventing notification bar from closing.');
 }
 
@@ -129,16 +211,16 @@ function updateNotification(notes, mailID) {
        callback: detailsBox
      },
      {
+       label: 'Mark as Legitimate',
+       accessKey: 'L',
+       popup: null,
+       callback: markAsLegitimate
+     },
+     {
        label: 'Preferences',
        accessKey: 'P',
        popup: null,
        callback: optionsBox
-     },
-     {
-       label: 'About',
-       accessKey: 'A',
-       popup: null,
-       callback: aboutBox
      },
    ];
 
@@ -163,6 +245,23 @@ function updateNotification(notes, mailID) {
                                       buttons);
 }
 
+// Notify the API for crowd-sourced improvements
+// This should not send any sensitive information back
+function sendStats (ip, code, source) {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.dnsbl.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        $.post('https://www.ilkertemir.com/dnsbl/api/v1/stat',
+               { 'ip': ip,
+                 'code': code,
+                 'dnsbl': source } );
+    }
+}
 function updateRBLinfo(mailID) {
     if (mailID != currentMailID) {
         // User has moved on, don't updae the notificationbox
@@ -173,7 +272,6 @@ function updateRBLinfo(mailID) {
     var rblInfo = document.getElementById("rblInfo");
     var imgSpinner = document.getElementById("imgSpinner");
     var label;
-
     if (numLookups != 0) { 
         label = "Number of outstanding RBL lookups: " + numLookups;
         imgSpinner.hidden = false;
@@ -185,10 +283,11 @@ function updateRBLinfo(mailID) {
     rblInfo.label = label;
 }
     
-function doRBLcheck(relays, rblService, mailID) {
+function doRBLcheck(relays, rblService, returnPath, mailID) {
     var match;
     var reverseAddr;
     var numDNSLookups = 0;
+    var numSQLLookups = 0;
     var safeMail = true;
 
     let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]
@@ -205,29 +304,50 @@ function doRBLcheck(relays, rblService, mailID) {
         let Listener = {
              onLookupComplete: function(request, record, status) {
                numDNSLookups--;
-
                totalDNSlookups[mailID]--;
                updateRBLinfo(mailID);
 
                if (Components.isSuccessCode(status)) {
                    while ( record && record.hasMore() ) {
                        resolvedAddr = record.getNextAddrAsString();
-                       RBLNotes[mailID].push ( { ip: addr, service: rblService, code: resolvedAddr } );
-                       safeMail = false;
+                       // This query HAS TO return only a single row
+                       let sql = "SELECT COUNT(id) as cnt FROM WhiteLIst " +
+                                 "WHERE ipAddress=? AND dnsblSource=? AND code=? AND sender=?";
+                       let values = [ addr,
+                                      rblService,
+                                      resolvedAddr,
+                                      returnPath ];
+                       numSQLLookups++;
+                       connection.execute(sql, values, function(row) {
+                            numSQLLookups--;
+
+                           // This will be 1 for existing records, 0 for non-existent ones
+                           let count = row.getResultByName('cnt');
+                           if (!count) { 
+                               RBLNotes[mailID].push ( { ip: addr,
+			        			 service: rblService, 
+                                                         code: resolvedAddr,
+                                                         sender: returnPath } );
+                               sendStats (addr, resolvedAddr, rblService);
+                               safeMail = false;
+                           } else {
+                               // Previously white listed
+                           }
+                           // Make sure we finished all lookups, both DNS and SQL
+                           if ( numSQLLookups == 0 ) {
+                               if (safeMail) {
+                                    // Pass
+                               } else {
+                                   updateNotification (RBLNotes[currentMailID], mailID)
+                               }
+                           }
+                       });
                    }
                }
                else {
-                   // RBL safe
+                   // No response from DNS RBL safe
                }
 
-               if (numDNSLookups == 0) {
-                   if (safeMail) {
-                       // Pass
-                   }
-                   else {
-                       updateNotification (RBLNotes[currentMailID], mailID)
-                   }
-               }
             }
         };
 
@@ -275,7 +395,7 @@ function mydump(arr,level) {
 }
 
 // Perform all RBL checks by calling doRBLcheck iteratively
-function doRBLchecks(relays, mailID) {
+function doRBLchecks(relays, returnPath, mailID) {
     var rblServices = [ 'zen.spamhaus.org',
 			'b.barracudacentral.org',
                         'dnsbl.abuse.ch',
@@ -292,7 +412,7 @@ function doRBLchecks(relays, mailID) {
     for (var i in rblServices) {
         // Check if enabled in preferences
         if ( pref.getBoolPref(rblServices[i]) ){
-            doRBLcheck (relays, rblServices[i], mailID);
+            doRBLcheck (relays, rblServices[i], returnPath, mailID);
         }
     }
 
@@ -300,7 +420,7 @@ function doRBLchecks(relays, mailID) {
     if ( pref.getBoolPref('custom_rbl_enabled') && pref.getCharPref('custom_rbl') ) {
         var customRBLs = pref.getCharPref('custom_rbl').split(/\s*\,\s*|\s+/);
         for (var i in customRBLs) {
-            doRBLcheck (relays, customRBLs[i], mailID);
+            doRBLcheck (relays, customRBLs[i], returnPath, mailID);
         }
     }
 
@@ -327,6 +447,10 @@ function pluginMain() {
       var addr;
       var numDNSLookups = 0;
       var temp = 0;
+
+      // This comes back as an array, we want it as string
+      // Some odd instances return multiple 'return-path's separated by comma 
+      var returnPath =  aMimeMsg.headers['return-path'].join().split(',')[0];
 
       let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]
                       .createInstance(Components.interfaces.nsIDNSService);
@@ -358,7 +482,7 @@ function pluginMain() {
              }
 
              if (numDNSLookups == 0) {
-                 doRBLchecks (relays, mailID);
+                 doRBLchecks (relays, returnPath, mailID);
              }
           }
       };
@@ -384,7 +508,7 @@ function pluginMain() {
       }
 
       if (numDNSLookups == 0) {
-          doRBLchecks (relays, mailID);
+          doRBLchecks (relays, returnPath, mailID);
       }
    }, true);
 }

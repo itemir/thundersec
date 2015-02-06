@@ -14,32 +14,52 @@
       <preference id="dnsbl.sorbs.net" name="extensions.dnsbl.dnsbl.sorbs.net" type="bool"/>
       <preference id="custom_rbl_enabled" name="extensions.dnsbl.custom_rbl_enabled" type="bool"/>
       <preference id="custom_rbl" name="extensions.dnsbl.custom_rbl" type="string"/>
+
+      <preference id="api_enabled" name="extensions.dnsbl.api_enabled" type="bool"/>
     </preferences>
-    <label value="Available DNSBL and RBL Services" style="font-weight: bold; font-size: large;"/>
-    <separator class="thin"/>
-    <hbox>
-      <vbox>
-        <checkbox id="checkbool.zen.spamhaus.org" preference="zen.spamhaus.org" label="zen.spamhaus.org" />
-        <checkbox id="checkbool.b.barracudacentral.org" preference="b.barracudacentral.org" label="b.barracudacentral.org" />
-        <checkbox id="checkbool.dnsbl.abuse.ch" preference="dnsbl.abuse.ch" label="dnsbl.abuse.ch" />
-        <checkbox id="checkbool.cbl.abuseat.org" preference="cbl.abuseat.org" label="cbl.abuseat.org" />
-      </vbox>
-      <vbox>
-        <checkbox id="checkbool.ubl.unsubscore.com" preference="ubl.unsubscore.com" label="ubl.unsubscore.com" />
-        <checkbox id="checkbool.bl.spamcop.net" preference="bl.spamcop.net" label="bl.spamcop.net" />
-        <checkbox id="checkbool.dnsbl.sorbs.net" preference="dnsbl.sorbs.net" label="dnsbl.sorbs.net" />
-        <hbox>
-           <checkbox id="checkbool.custom_rbl_enabled" preference="custom_rbl_enabled" label="" onclick="enableCustomRBL(this);" />
-           <textbox id="string.custom_rbl" preference="custom_rbl" onclick="clearInput();"/>
-           <script>
-               if ( document.getElementById("checkbool.custom_rbl_enabled").checked ) {
-                   document.getElementById("string.custom_rbl").removeAttribute("disabled");
-               } else {
-                   document.getElementById("string.custom_rbl").setAttribute("disabled", true);
-               }
-           </script>
-        </hbox>
-    </vbox>
-    </hbox>
+    <tabbox id="optionsTabs" selectedIndex="0">
+      <tabs>
+        <tab label="DNSBL Services"/>
+        <tab label="Advanced"/>
+      </tabs>
+      <tabpanels>
+        <tabpanel>
+          <hbox>
+            <vbox>
+              <checkbox id="checkbool.zen.spamhaus.org" preference="zen.spamhaus.org" label="zen.spamhaus.org" />
+              <checkbox id="checkbool.b.barracudacentral.org" preference="b.barracudacentral.org" label="b.barracudacentral.org" />
+              <checkbox id="checkbool.dnsbl.abuse.ch" preference="dnsbl.abuse.ch" label="dnsbl.abuse.ch" />
+              <checkbox id="checkbool.cbl.abuseat.org" preference="cbl.abuseat.org" label="cbl.abuseat.org" />
+            </vbox>
+            <vbox>
+              <checkbox id="checkbool.ubl.unsubscore.com" preference="ubl.unsubscore.com" label="ubl.unsubscore.com" />
+              <checkbox id="checkbool.bl.spamcop.net" preference="bl.spamcop.net" label="bl.spamcop.net" />
+              <checkbox id="checkbool.dnsbl.sorbs.net" preference="dnsbl.sorbs.net" label="dnsbl.sorbs.net" />
+              <hbox>
+                 <checkbox id="checkbool.custom_rbl_enabled" preference="custom_rbl_enabled" label="" onclick="enableCustomRBL(this);" />
+                 <textbox id="string.custom_rbl" preference="custom_rbl" onclick="clearInput();"/>
+                 <script>
+                     if ( document.getElementById("checkbool.custom_rbl_enabled").checked ) {
+                         document.getElementById("string.custom_rbl").removeAttribute("disabled");
+                     } else {
+                         document.getElementById("string.custom_rbl").setAttribute("disabled", true);
+                     }
+                 </script>
+              </hbox>
+            </vbox>
+          </hbox>
+        </tabpanel>
+        <tabpanel>
+           <vbox style='width: 100%;'>
+             <checkbox id="checkbool.api_enabled" preference="api_enabled" label="Send sanitized information to the cloud for improved results." />
+             <separator/>
+             <hbox pack='center'>
+               <button label='View Whitelist' oncommand='viewWhitelist();' />
+               <button label='Clear Whitelist' oncommand='clearWhitelist();' />
+             </hbox>
+           </vbox>
+        </tabpanel> 
+      </tabpanels>
+    </tabbox>
   </prefpane>
 </prefwindow>
