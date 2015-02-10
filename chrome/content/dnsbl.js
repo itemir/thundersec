@@ -489,7 +489,10 @@ function pluginMain() {
 
       for (var item in aMimeMsg.headers["received"]) {
          if ( relay = parseReceivedLine (aMimeMsg.headers["received"][item]) ) {
-             if ( /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.exec (relay) ) {
+             if ( relay.indexOf(':') != -1 ) {
+                 // IPv6 - Not supported 
+             }
+             else if ( /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.exec (relay) ) {
                  if ( relays.indexOf (relay) == -1 ) {
                      if ( !isReserved(relay) ) { 
                          relays.push ( relay );
