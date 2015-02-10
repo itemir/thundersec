@@ -356,7 +356,7 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
         match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec (addr);
         if (match) {
            reverseAddr = match[4] + "." + match[3] + "." + match[2] + "." + match[1];
-           rblQuery = reverseAddr + "." + rblService;
+           rblQuery = reverseAddr + "." + rblService + ".";
 
            numDNSLookups++;
 
