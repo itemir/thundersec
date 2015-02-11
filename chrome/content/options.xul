@@ -2,6 +2,7 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://dnsbl/locale/options.dtd">
 <prefwindow id="dnsbl-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
+  <script src="chrome://dnsbl/content/settings.js"/>
   <script src="chrome://dnsbl/content/options.js"/>
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>

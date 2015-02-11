@@ -51,7 +51,7 @@ function clearWhitelist() {
   if ( window.confirm ('Your whitelist will be cleared. Are you sure?') ){
       Components.utils.import("resource://gre/modules/Sqlite.jsm");
       Sqlite.openConnection(
-          { path: "dnsbl.sqlite" }
+          { path: DB_NAME }
       ).then(
           function onConnection(conn) {
              conn.tableExists("WhiteList").then(

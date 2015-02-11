@@ -91,7 +91,7 @@ function queryWhitelist(conn) {
 function viewWhitelist() {
    Components.utils.import("resource://gre/modules/Sqlite.jsm");
    Sqlite.openConnection(
-       { path: "dnsbl.sqlite" }
+       { path: DB_NAME }
    ).then(
        function onConnection(conn) {
            queryWhitelist(conn);

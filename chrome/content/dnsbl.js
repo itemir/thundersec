@@ -36,7 +36,7 @@ function initialize() {
     if (!connection) {
         Components.utils.import("resource://gre/modules/Sqlite.jsm");
         Sqlite.openConnection(
-            { path: "dnsbl.sqlite" }
+            { path: DB_NAME }
         ).then(
             function onConnection(conn) {
                conn.tableExists("WhiteList").then(
@@ -154,20 +154,10 @@ function updateWhiteList(rblNotes) {
         connection.execute(sql, values);
 
         // Notify the API for crowd-sourced improvements
-        var pref = Components.classes["@mozilla.org/preferences-service;1"]
-                         .getService(Components.interfaces.nsIPrefService)
-                         .getBranch("extensions.dnsbl.");
-
-        // Check if API usage is allowed in preferences
-        if ( pref.getBoolPref('api_enabled') ) {
-            // We will hash the sender for privacy
-            // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
-            $.post('https://www.ilkertemir.com/dnsbl/api/v1/add', 
-                   { 'ip': rblNote.ip,
-                     'code': rblNote.code,
-                     'dnsbl': rblNote.service,
-                     'senderHash': Sha256.hash (rblNote.sender) } );
-        }
+        apiSendWhiteList(rblNote.ip, 
+                         rblNote.code,
+                         rblNote.service,
+                         rblNote.sender);
     }
     connection.execute("COMMIT TRANSACTION");
 }
@@ -247,7 +237,7 @@ function updateNotification(notes, mailID) {
 
 // Notify the API for crowd-sourced improvements
 // This should not send any sensitive information back
-function sendStats (ip, code, source) {
+function apiSendStats (ip, code, source) {
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                      .getService(Components.interfaces.nsIPrefService)
                      .getBranch("extensions.dnsbl.");
@@ -256,12 +246,33 @@ function sendStats (ip, code, source) {
     if ( pref.getBoolPref('api_enabled') ) {
         // We will hash the sender for privacy
         // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
-        $.post('https://www.ilkertemir.com/dnsbl/api/v1/stat',
+        $.post( API_URL + 'stat',
                { 'ip': ip,
                  'code': code,
-                 'dnsbl': source } );
+                 'dnsbl': source,
+                 'version': VERSION } );
     }
 }
+
+function apiSendWhiteList(ip, code, source,sender) {
+    // Notify the API for crowd-sourced improvements
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.dnsbl.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        $.post( API_URL + 'add',
+               { 'ip': ip,
+                 'code': code,
+                 'dnsbl': source,
+                 'senderHash': Sha256.hash (sender),
+                 'version': VERSION } );
+    }
+}
+
 function updateRBLinfo(mailID) {
     if (mailID != currentMailID) {
         // User has moved on, don't updae the notificationbox
@@ -328,7 +339,7 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
 			        			 service: rblService, 
                                                          code: resolvedAddr,
                                                          sender: returnPath } );
-                               sendStats (addr, resolvedAddr, rblService);
+                               apiSendStats (addr, resolvedAddr, rblService);
                                safeMail = false;
                            } else {
                                // Previously white listed
