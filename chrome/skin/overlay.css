@@ -1,21 +1,20 @@
-/* This is just an example.  You shouldn't do this. */
-#dnsbl-hello
+#thundersec-hello
 {
 }
-#dnsbl-toolbar-button
+#thundersec-toolbar-button
 {
-  list-style-image: url("chrome://dnsbl/skin/toolbar-button.png");
+  list-style-image: url("chrome://thundersec/skin/toolbar-button.png");
   -moz-image-region: rect(0px 24px 24px 0px);
 }
-#dnsbl-toolbar-button:hover
+#thundersec-toolbar-button:hover
 {
   -moz-image-region: rect(24px 24px 48px  0px);
 }
-[iconsize="small"] #dnsbl-toolbar-button
+[iconsize="small"] #thundersec-toolbar-button
 {
   -moz-image-region: rect( 0px 40px 16px 24px);
 }
-[iconsize="small"] #dnsbl-toolbar-button:hover
+[iconsize="small"] #thundersec-toolbar-button:hover
 {
   -moz-image-region: rect(24px 40px 40px 24px);
 }

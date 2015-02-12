@@ -1,5 +1,5 @@
 /*
-    DNSBL/RBL Add-on for Mozilla Thunderbird
+    Security Extensions for Mozilla Thunderbird
     Copyright (C) 2015 by Ilker Temir (@ilkertemir) and Tim Sammut (@t1msammut)
 
     This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ function enableCustomRBL(item) {
 // Brings in whitelist popup
 function viewWhitelist() {
     var features = "chrome, dialog, centerscreen, scrollbars, width=700, height=500";
-    window.openDialog("chrome://dnsbl/content/whitelist.xul", "Whitelist", features);
+    window.openDialog("chrome://thundersec/content/whitelist.xul", "Whitelist", features);
 }
 
 // Clears the whitelist

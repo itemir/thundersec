@@ -3,12 +3,12 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
     <Description about="urn:mozilla:install-manifest">
         <em:type>2</em:type> <!-- 2 : Extension -->
-        <em:id>dnsbl@community</em:id>
+        <em:id>thundersec@community</em:id>
         <em:version>0.1</em:version>
-        <em:name>DNSBL/RBL Support</em:name>
-        <em:description>Provides client based support to add DNSBL and RBL services to Mozilla Thunderbird. Can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
-        <em:iconURL>chrome://dnsbl/content/images/dnsbl.png</em:iconURL>
-        <em:homepageURL>https://github.com/itemir/thunderbird-dnsbl</em:homepageURL>
+        <em:name>ThunderSec</em:name>
+        <em:description>Provides security features for Mozilla Thunderbird.\n\nThese include DNSBL and RBL support, DKIM and SPF failure verifications. DNSBL support can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
+        <em:iconURL>chrome://thundersec/content/images/thundersec.png</em:iconURL>
+        <em:homepageURL>https://github.com/itemir/thundersec</em:homepageURL>
         <em:creator>Ilker Temir and Tim Sammut</em:creator>
         <em:targetApplication>
             <Description>
@@ -18,7 +18,7 @@
                 <em:maxVersion>39.0</em:maxVersion>
             </Description>
         </em:targetApplication>
-        <em:optionsURL>chrome://dnsbl/content/options.xul</em:optionsURL>
-        <em:aboutURL>chrome://dnsbl/content/about.xul</em:aboutURL>
+        <em:optionsURL>chrome://thundersec/content/options.xul</em:optionsURL>
+        <em:aboutURL>chrome://thundersec/content/about.xul</em:aboutURL>
     </Description>
 </RDF>

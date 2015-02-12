@@ -2,19 +2,19 @@
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<!DOCTYPE dialog SYSTEM "chrome://dnsbl/locale/about.dtd">
+<!DOCTYPE dialog SYSTEM "chrome://thundersec/locale/about.dtd">
 
-<dialog title="&about; DNSBL/RBL Add-on for Mozilla Thunderbird" orient="vertical" autostretch="always" onload="sizeToContent()" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<dialog title="&about; Security Extensions for Mozilla Thunderbird" orient="vertical" autostretch="always" onload="sizeToContent()" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <groupbox align="center" orient="horizontal">
     <vbox>
-      <label value="DNSBL/RBL Add-on for Mozilla Thunderbird" style="font-weight: bold; font-size: x-large;"/>
+      <label value="Security Extensions for Mozilla Thunderbird" style="font-weight: bold; font-size: x-large;"/>
       <label value="&version; 0.1 beta"/>
       <separator class="thin"/>
       <label value="&createdBy;" style="font-weight: bold;"/>
       <label value="Ilker Temir and Tim Sammut"/>
       <separator class="thin"/>
       <label value="Source:" style="font-weight: bold;"/>
-      <label value="https://github.com/itemir/thunderbird-dnsbl"/>
+      <label value="https://github.com/itemir/thundersec"/>
       <separator class="thin"/>
     </vbox>
   </groupbox>

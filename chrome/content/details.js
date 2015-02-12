@@ -1,5 +1,5 @@
 /*
-    DNSBL/RBL Add-on for Mozilla Thunderbird
+    Security Extensions for Mozilla Thunderbird
     Copyright (C) 2015 by Ilker Temir (@ilkertemir) and Tim Sammut (@t1msammut)
 
     This program is free software; you can redistribute it and/or

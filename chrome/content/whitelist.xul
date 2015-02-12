@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog title="Whitelist" orient="vertical" autostretch="always" onload="viewWhitelist();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/javascript" src="chrome://dnsbl/content/settings.js"/>
-  <script type="application/javascript" src="chrome://dnsbl/content/whitelist.js"/>
-  <script src="chrome://dnsbl/content/jquery-1.11.2.min.js" />
+  <script type="application/javascript" src="chrome://thundersec/content/settings.js"/>
+  <script type="application/javascript" src="chrome://thundersec/content/whitelist.js"/>
+  <script src="chrome://thundersec/content/jquery-1.11.2.min.js" />
   <div id='whitelistBox' align="center" orient="horizontal" overflow="auto">
   </div>
 </dialog>

@@ -1,5 +1,5 @@
 /*
-    DNSBL/RBL Add-on for Mozilla Thunderbird
+    Security Extensions for Mozilla Thunderbird
     Copyright (C) 2015 by Ilker Temir (@ilkertemir) and Tim Sammut (@t1msammut)
 
     This program is free software; you can redistribute it and/or
@@ -88,7 +88,7 @@ function apiCheckVersion() {
 function apiSendStats (ip, code, source) {
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                      .getService(Components.interfaces.nsIPrefService)
-                     .getBranch("extensions.dnsbl.");
+                     .getBranch("extensions.thundersec.");
 
     // Check if API usage is allowed in preferences
     if ( pref.getBoolPref('api_enabled') ) {
@@ -107,7 +107,7 @@ function apiSendStats (ip, code, source) {
 function apiSendWhiteList(ip, code, source,sender) {
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                      .getService(Components.interfaces.nsIPrefService)
-                     .getBranch("extensions.dnsbl.");
+                     .getBranch("extensions.thundersec.");
 
     // Check if API usage is allowed in preferences
     if ( pref.getBoolPref('api_enabled') ) {
@@ -242,13 +242,13 @@ function markAsLegitimate(notf, desc) {
 
 function detailsBox(notf, desc) {
     var params = { notes: RBLNotes[currentMailID] };
-    window.openDialog("chrome://dnsbl/content/details.xul", "", "chrome, dialog, centerscreen, resizable=no", params);
+    window.openDialog("chrome://thundersec/content/details.xul", "", "chrome, dialog, centerscreen, resizable=no", params);
     throw new Error('Preventing notification bar from closing.');
 }
 
 function optionsBox(notf, desc) {
     var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
-    window.openDialog("chrome://dnsbl/content/options.xul", "Preferences", features);
+    window.openDialog("chrome://thundersec/content/options.xul", "Preferences", features);
     throw new Error('Preventing notification bar from closing.');
 }
 
@@ -444,7 +444,7 @@ function doRBLchecks(relays, returnPath, mailID) {
 
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                          .getService(Components.interfaces.nsIPrefService)
-                         .getBranch("extensions.dnsbl.");
+                         .getBranch("extensions.thundersec.");
 
     // Do this for each of the RBL services
     for (var i in rblServices) {

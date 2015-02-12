@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog title="Details" orient="vertical" autostretch="always" onload="updateDetails();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/javascript" src="chrome://dnsbl/content/details.js"/>
+  <script type="application/javascript" src="chrome://thundersec/content/details.js"/>
   <groupbox id='containerBox' align="center" orient="horizontal">
   </groupbox>
 </dialog>

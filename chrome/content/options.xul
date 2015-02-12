@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://dnsbl/locale/options.dtd">
-<prefwindow id="dnsbl-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
-  <script src="chrome://dnsbl/content/settings.js"/>
-  <script src="chrome://dnsbl/content/options.js"/>
+<!DOCTYPE prefwindow SYSTEM "chrome://thundersec/locale/options.dtd">
+<prefwindow id="thundersec-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
+  <script src="chrome://thundersec/content/settings.js"/>
+  <script src="chrome://thundersec/content/options.js"/>
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>
-      <preference id="zen.spamhaus.org" name="extensions.dnsbl.zen.spamhaus.org" type="bool"/>
-      <preference id="b.barracudacentral.org" name="extensions.dnsbl.b.barracudacentral.org" type="bool"/>
-      <preference id="dnsbl.abuse.ch" name="extensions.dnsbl.dnsbl.abuse.ch" type="bool"/>
-      <preference id="cbl.abuseat.org" name="extensions.dnsbl.cbl.abuseat.org" type="bool"/>
-      <preference id="ubl.unsubscore.com" name="extensions.dnsbl.ubl.unsubscore.com" type="bool"/>
-      <preference id="bl.spamcop.net" name="extensions.dnsbl.bl.spamcop.net" type="bool"/>
-      <preference id="dnsbl.sorbs.net" name="extensions.dnsbl.dnsbl.sorbs.net" type="bool"/>
-      <preference id="custom_rbl_enabled" name="extensions.dnsbl.custom_rbl_enabled" type="bool"/>
-      <preference id="custom_rbl" name="extensions.dnsbl.custom_rbl" type="string"/>
+      <preference id="zen.spamhaus.org" name="extensions.thundersec.zen.spamhaus.org" type="bool"/>
+      <preference id="b.barracudacentral.org" name="extensions.thundersec.b.barracudacentral.org" type="bool"/>
+      <preference id="dnsbl.abuse.ch" name="extensions.thundersec.dnsbl.abuse.ch" type="bool"/>
+      <preference id="cbl.abuseat.org" name="extensions.thundersec.cbl.abuseat.org" type="bool"/>
+      <preference id="ubl.unsubscore.com" name="extensions.thundersec.ubl.unsubscore.com" type="bool"/>
+      <preference id="bl.spamcop.net" name="extensions.thundersec.bl.spamcop.net" type="bool"/>
+      <preference id="dnsbl.sorbs.net" name="extensions.thundersec.dnsbl.sorbs.net" type="bool"/>
+      <preference id="custom_rbl_enabled" name="extensions.thundersec.custom_rbl_enabled" type="bool"/>
+      <preference id="custom_rbl" name="extensions.thundersec.custom_rbl" type="string"/>
 
-      <preference id="api_enabled" name="extensions.dnsbl.api_enabled" type="bool"/>
+      <preference id="api_enabled" name="extensions.thundersec.api_enabled" type="bool"/>
     </preferences>
     <tabbox id="optionsTabs" selectedIndex="0">
       <tabs>

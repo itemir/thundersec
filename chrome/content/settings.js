@@ -1,5 +1,5 @@
 /*
-    DNSBL/RBL Add-on for Mozilla Thunderbird
+    Security Extensions for Mozilla Thunderbird
     Copyright (C) 2015 by Ilker Temir (@ilkertemir) and Tim Sammut (@t1msammut)
 
     This program is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 
 // Extension settings 
 
-const HOME_URL = 'https://github.com/itemir/thunderbird-dnsbl';
-const DB_NAME = 'dnsbl.sqlite';
+const HOME_URL = 'https://github.com/itemir/thundersec';
+const DB_NAME = 'thundersec.sqlite';
 const API_URL = 'https://www.ilkertemir.com/thundersec/api/v1/';
 const VERSION = '0.1';

@@ -1,4 +1,4 @@
-content   dnsbl                 chrome/content/
-skin      dnsbl   classic/1.0   chrome/skin/
-locale    dnsbl   en-US         chrome/locale/en-US/
-overlay chrome://messenger/content/msgHdrViewOverlay.xul chrome://dnsbl/content/dnsbl.xul
+content   thundersec                 chrome/content/
+skin      thundersec   classic/1.0   chrome/skin/
+locale    thundersec   en-US         chrome/locale/en-US/
+overlay chrome://messenger/content/msgHdrViewOverlay.xul chrome://thundersec/content/thundersec.xul
