@@ -22,8 +22,12 @@ var RBLNotes = {};
 var totalDNSlookups = {};
 var currentMailID;
 var connection;
+var initialized = false;
 
-initialize();
+if ( !initialized) {
+    initialized = true; 
+    initialize();
+}
 
 function initialize() {
     // Add event listener
@@ -32,6 +36,9 @@ function initialize() {
       pluginMain();
     }, true);
 
+    // Check new version now (in a minute) and then every day
+    setTimeout (apiCheckVersion, 60*1000); 
+    setInterval (apiCheckVersion, 24*60*60*1000);
   
     if (!connection) {
         Components.utils.import("resource://gre/modules/Sqlite.jsm");
@@ -55,6 +62,64 @@ function initialize() {
             }
         );
     } // if (!connection)
+}
+
+// Checks if we are running the latest version
+function apiCheckVersion() {
+    $.get (API_URL + 'version', function (data) {
+        let latestVersion = data['version'];
+        let description = data['description'];
+ 
+        if ( version_compare (VERSION, latestVersion, '<') ) {
+            let message = 'New Version Available\n\n' +
+                          'ThunderSec v' + latestVersion + ' is available.\n' +
+                          'Description: ' + description + '\n\n' +
+                          'Would you like to download?';
+ 
+            if ( window.confirm (message) ) {
+                window.open (HOME_URL,'','chrome,centerscreen');
+            }
+        }
+    }, 'json');
+}
+
+// Notify the API for crowd-sourced improvements
+// This should not send any sensitive information back
+function apiSendStats (ip, code, source) {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.dnsbl.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        $.post( API_URL + 'dnsbl/stat',
+               { 'ip': ip,
+                 'code': code,
+                 'dnsbl': source,
+                 'version': VERSION } );
+    }
+}
+
+// Notify the API for crowd-sourced improvements
+// This should not send any sensitive information back
+function apiSendWhiteList(ip, code, source,sender) {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.dnsbl.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        $.post( API_URL + 'dnsbl/whitelist',
+               { 'ip': ip,
+                 'code': code,
+                 'dnsbl': source,
+                 'senderHash': Sha256.hash (sender),
+                 'version': VERSION } );
+    }
 }
 
 function IPnumber(IPaddress) {
@@ -233,44 +298,6 @@ function updateNotification(notes, mailID) {
                                       null,
                                       10,
                                       buttons);
-}
-
-// Notify the API for crowd-sourced improvements
-// This should not send any sensitive information back
-function apiSendStats (ip, code, source) {
-    var pref = Components.classes["@mozilla.org/preferences-service;1"]
-                     .getService(Components.interfaces.nsIPrefService)
-                     .getBranch("extensions.dnsbl.");
-
-    // Check if API usage is allowed in preferences
-    if ( pref.getBoolPref('api_enabled') ) {
-        // We will hash the sender for privacy
-        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
-        $.post( API_URL + 'stat',
-               { 'ip': ip,
-                 'code': code,
-                 'dnsbl': source,
-                 'version': VERSION } );
-    }
-}
-
-function apiSendWhiteList(ip, code, source,sender) {
-    // Notify the API for crowd-sourced improvements
-    var pref = Components.classes["@mozilla.org/preferences-service;1"]
-                     .getService(Components.interfaces.nsIPrefService)
-                     .getBranch("extensions.dnsbl.");
-
-    // Check if API usage is allowed in preferences
-    if ( pref.getBoolPref('api_enabled') ) {
-        // We will hash the sender for privacy
-        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
-        $.post( API_URL + 'add',
-               { 'ip': ip,
-                 'code': code,
-                 'dnsbl': source,
-                 'senderHash': Sha256.hash (sender),
-                 'version': VERSION } );
-    }
 }
 
 function updateRBLinfo(mailID) {

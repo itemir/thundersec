@@ -19,6 +19,7 @@
 
 // Extension settings 
 
+const HOME_URL = 'https://github.com/itemir/thunderbird-dnsbl';
 const DB_NAME = 'dnsbl.sqlite';
-const API_URL = 'https://www.ilkertemir.com/dnsbl/api/v1/';
+const API_URL = 'https://www.ilkertemir.com/thundersec/api/v1/';
 const VERSION = '0.1';

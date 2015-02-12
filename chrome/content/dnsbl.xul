@@ -3,6 +3,7 @@
 <overlay id="dnsbl-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
    <script src="chrome://dnsbl/content/settings.js" />
    <script src="chrome://dnsbl/content/dnsbl.js" />
+   <script src="chrome://dnsbl/content/version_compare.js" />
    <script src="chrome://dnsbl/content/jquery-1.11.2.min.js" />
    <script src="chrome://dnsbl/content/sha256.js" />
    <statusbar id="status-bar">
