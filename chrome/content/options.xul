@@ -13,8 +13,8 @@
       <preference id="ubl.unsubscore.com" name="extensions.thundersec.ubl.unsubscore.com" type="bool"/>
       <preference id="bl.spamcop.net" name="extensions.thundersec.bl.spamcop.net" type="bool"/>
       <preference id="dnsbl.sorbs.net" name="extensions.thundersec.dnsbl.sorbs.net" type="bool"/>
-      <preference id="custom_rbl_enabled" name="extensions.thundersec.custom_rbl_enabled" type="bool"/>
-      <preference id="custom_rbl" name="extensions.thundersec.custom_rbl" type="string"/>
+      <preference id="custom_dnsbl_enabled" name="extensions.thundersec.custom_dnsbl_enabled" type="bool"/>
+      <preference id="custom_dnsbl" name="extensions.thundersec.custom_dnsbl" type="string"/>
 
       <preference id="api_enabled" name="extensions.thundersec.api_enabled" type="bool"/>
     </preferences>
@@ -37,13 +37,13 @@
               <checkbox id="checkbool.bl.spamcop.net" preference="bl.spamcop.net" label="bl.spamcop.net" />
               <checkbox id="checkbool.dnsbl.sorbs.net" preference="dnsbl.sorbs.net" label="dnsbl.sorbs.net" />
               <hbox>
-                 <checkbox id="checkbool.custom_rbl_enabled" preference="custom_rbl_enabled" label="" onclick="enableCustomRBL(this);" />
-                 <textbox id="string.custom_rbl" preference="custom_rbl" onclick="clearInput();"/>
+                 <checkbox id="checkbool.custom_dnsbl_enabled" preference="custom_dnsbl_enabled" label="" onclick="enableCustomDNSBL(this);" />
+                 <textbox id="string.custom_dnsbl" preference="custom_dnsbl" onclick="clearInput();"/>
                  <script>
-                     if ( document.getElementById("checkbool.custom_rbl_enabled").checked ) {
-                         document.getElementById("string.custom_rbl").removeAttribute("disabled");
+                     if ( document.getElementById("checkbool.custom_dnsbl_enabled").checked ) {
+                         document.getElementById("string.custom_dnsbl").removeAttribute("disabled");
                      } else {
-                         document.getElementById("string.custom_rbl").setAttribute("disabled", true);
+                         document.getElementById("string.custom_dnsbl").setAttribute("disabled", true);
                      }
                  </script>
               </hbox>

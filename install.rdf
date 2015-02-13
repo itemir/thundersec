@@ -6,7 +6,7 @@
         <em:id>thundersec@community</em:id>
         <em:version>0.1</em:version>
         <em:name>ThunderSec</em:name>
-        <em:description>Provides security features for Mozilla Thunderbird.\n\nThese include DNSBL and RBL support, DKIM and SPF failure verifications. DNSBL support can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
+        <em:description>Provides security features for Mozilla Thunderbird. These include DNSBL and RBL support, DKIM and SPF failure verifications. DNSBL support can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
         <em:iconURL>chrome://thundersec/content/images/thundersec.png</em:iconURL>
         <em:homepageURL>https://github.com/itemir/thundersec</em:homepageURL>
         <em:creator>Ilker Temir and Tim Sammut</em:creator>

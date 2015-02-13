@@ -2,6 +2,25 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog title="Details" orient="vertical" autostretch="always" onload="updateDetails();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/javascript" src="chrome://thundersec/content/details.js"/>
-  <groupbox id='containerBox' align="center" orient="horizontal">
-  </groupbox>
+  <tabbox id="detailsTabs" selectedIndex="0">
+    <tabs>
+      <tab id='dnsblTab' label="DNSBL"/>
+      <tab id='spfTab' label="SPF"/>
+      <tab id='dkimTab' label="DKIM"/>
+    </tabs>
+    <tabpanels>
+      <tabpanel>
+        <groupbox id='dnsblBox' align="center" orient="horizontal">
+        </groupbox>
+      </tabpanel>
+      <tabpanel>
+        <groupbox id='spfBox' align="center" orient="horizontal">
+        </groupbox>        
+      </tabpanel>
+      <tabpanel>
+        <groupbox id='dkimBox' align="center" orient="horizontal">
+        </groupbox>
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
 </dialog>

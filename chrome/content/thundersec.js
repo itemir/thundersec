@@ -18,7 +18,9 @@
 */
 
 // Global variables
-var RBLNotes = {};
+var DNSBL = {};
+var SPF = {};
+var DKIM = {};
 var totalDNSlookups = {};
 var currentMailID;
 var connection;
@@ -205,24 +207,24 @@ function createTable(connection) {
     connection.execute (sql);
 }
 
-function updateWhiteList(rblNotes) {
+function updateWhiteList(dnsblNotes) {
     connection.execute("BEGIN IMMEDIATE TRANSACTION");
-    for (var i in rblNotes) {
-        let rblNote = rblNotes[i];
-        let values = [ rblNote.ip,
-                       rblNote.service, 
-                       rblNote.code,
-                       rblNote.sender ];
+    for (var i in dnsblNotes) {
+        let dnsblNote = dnsblNotes[i];
+        let values = [ dnsblNote.ip,
+                       dnsblNote.service, 
+                       dnsblNote.code,
+                       dnsblNote.sender ];
         let sql = "INSERT OR IGNORE INTO WhiteList " +
                   "('ipAddress', 'dnsblSource', 'code', 'sender') " +
                   "VALUES (?, ?, ?, ?)";
         connection.execute(sql, values);
 
         // Notify the API for crowd-sourced improvements
-        apiSendWhiteList(rblNote.ip, 
-                         rblNote.code,
-                         rblNote.service,
-                         rblNote.sender);
+        apiSendWhiteList(dnsblNote.ip, 
+                         dnsblNote.code,
+                         dnsblNote.service,
+                         dnsblNote.sender);
     }
     connection.execute("COMMIT TRANSACTION");
 }
@@ -233,16 +235,22 @@ function markAsLegitimate(notf, desc) {
                                   "this user will no longer be marked for the same " +
                                   "reason in the future.");
     if (confirm) {
-        // We need to pass the RBLNotes here, otherwise it will be reset before the database is processed
-        updateWhiteList( RBLNotes[currentMailID] );
+        // We need to pass the DNSBL here, otherwise it will be reset before the database is processed
+        updateWhiteList( DNSBL[currentMailID] );
     } else {
         throw new Error('Preventing notification bar from closing.'); 
     }
 }
 
 function detailsBox(notf, desc) {
-    var params = { notes: RBLNotes[currentMailID] };
-    window.openDialog("chrome://thundersec/content/details.xul", "", "chrome, dialog, centerscreen, resizable=no", params);
+    var params = { dnsbl: DNSBL[currentMailID],
+                   dkim: DKIM[currentMailID],
+                   spf: SPF[currentMailID] };
+
+    window.openDialog("chrome://thundersec/content/details.xul", "",
+                      "chrome, dialog, centerscreen, resizable=no",
+                      params);
+
     throw new Error('Preventing notification bar from closing.');
 }
 
@@ -252,7 +260,7 @@ function optionsBox(notf, desc) {
     throw new Error('Preventing notification bar from closing.');
 }
 
-function updateNotification(notes, mailID) {
+function updateNotification(mailID) {
    if (mailID != currentMailID) { 
        // User has moved on, don't updae the notificationbox
        return;
@@ -261,13 +269,13 @@ function updateNotification(notes, mailID) {
    var buttons = [
      {
        label: 'Details',
-       accessKey: 'B',
+       accessKey: 'D',
        popup: null,
        callback: detailsBox
      },
      {
        label: 'Mark as Legitimate',
-       accessKey: 'L',
+       accessKey: 'M',
        popup: null,
        callback: markAsLegitimate
      },
@@ -280,48 +288,58 @@ function updateNotification(notes, mailID) {
    ];
 
    let notificationBox = document.getElementById("msgNotificationBar");
-   if ( notificationBox.getNotificationWithValue( 'rbl' ) ) {
+   if ( notificationBox.getNotificationWithValue( 'dnsbl' ) ) {
        notificationBox.removeCurrentNotification();
    }
 
-   var notificationText;
-   if (notes.length == 1) { 
-       notificationText = "1 RBL failure.";
+   let notificationText = '';
+
+   if ( DNSBL[currentMailID].length == 1 ) { 
+       notificationText = notificationText + "DNSBL failure. ";
    }
-   else {
-       notificationText = notes.length + " RBL failures.";
+   else if ( DNSBL[currentMailID].length > 1 ) {
+       notificationText = notificationText + "Multiple DNSBL failures. ";
    }
-   notificationText = notificationText + " Please check Details for more information."
+
+   if ( !SPF[currentMailID].pass ) {
+      notificationText = notificationText + "SPF failure. ";
+   }
+
+   if ( !DKIM[currentMailID].pass ) {
+      notificationText = notificationText + "DKIM failure. ";
+   }
+
+   notificationText = notificationText + "Please check Details for more information."
 
    notificationBox.appendNotification(notificationText,
-                                      "rbl",
+                                      "dnsbl",
                                       null,
                                       10,
                                       buttons);
 }
 
-function updateRBLinfo(mailID) {
+function updateDNSBLinfo(mailID) {
     if (mailID != currentMailID) {
         // User has moved on, don't updae the notificationbox
         return;
     }
     var numLookups = totalDNSlookups[mailID]
 
-    var rblInfo = document.getElementById("rblInfo");
+    var dnsblInfo = document.getElementById("dnsblInfo");
     var imgSpinner = document.getElementById("imgSpinner");
     var label;
     if (numLookups != 0) { 
-        label = "Number of outstanding RBL lookups: " + numLookups;
+        label = "Number of outstanding DNSBL lookups: " + numLookups;
         imgSpinner.hidden = false;
     }
     else {
         label = "";
         imgSpinner.hidden = true;
     }
-    rblInfo.label = label;
+    dnsblInfo.label = label;
 }
     
-function doRBLcheck(relays, rblService, returnPath, mailID) {
+function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
     var match;
     var reverseAddr;
     var numDNSLookups = 0;
@@ -335,7 +353,7 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
                  .getService(Components.interfaces.nsIThreadManager).currentThread;
 
     for (var i in relays) {
-        let rblQuery;
+        let dnsblQuery;
         let addr;
         let resolvedAddr;
 
@@ -343,16 +361,16 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
              onLookupComplete: function(request, record, status) {
                numDNSLookups--;
                totalDNSlookups[mailID]--;
-               updateRBLinfo(mailID);
+               updateDNSBLinfo(mailID);
 
                if (Components.isSuccessCode(status)) {
                    while ( record && record.hasMore() ) {
                        resolvedAddr = record.getNextAddrAsString();
                        // This query HAS TO return only a single row
-                       let sql = "SELECT COUNT(id) as cnt FROM WhiteLIst " +
+                       let sql = "SELECT COUNT(id) as cnt FROM WhiteList " +
                                  "WHERE ipAddress=? AND dnsblSource=? AND code=? AND sender=?";
                        let values = [ addr,
-                                      rblService,
+                                      dnsblService,
                                       resolvedAddr,
                                       returnPath ];
                        numSQLLookups++;
@@ -362,11 +380,11 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
                            // This will be 1 for existing records, 0 for non-existent ones
                            let count = row.getResultByName('cnt');
                            if (!count) { 
-                               RBLNotes[mailID].push ( { ip: addr,
-			        			 service: rblService, 
+                               DNSBL[mailID].push ( { ip: addr,
+			        			 service: dnsblService, 
                                                          code: resolvedAddr,
                                                          sender: returnPath } );
-                               apiSendStats (addr, resolvedAddr, rblService);
+                               apiSendStats (addr, resolvedAddr, dnsblService);
                                safeMail = false;
                            } else {
                                // Previously white listed
@@ -376,14 +394,14 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
                                if (safeMail) {
                                     // Pass
                                } else {
-                                   updateNotification (RBLNotes[currentMailID], mailID)
+                                   updateNotification (mailID)
                                }
                            }
                        });
                    }
                }
                else {
-                   // No response from DNS RBL safe
+                   // No response from DNS DNSBL safe
                }
 
             }
@@ -394,14 +412,14 @@ function doRBLcheck(relays, rblService, returnPath, mailID) {
         match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec (addr);
         if (match) {
            reverseAddr = match[4] + "." + match[3] + "." + match[2] + "." + match[1];
-           rblQuery = reverseAddr + "." + rblService + ".";
+           dnsblQuery = reverseAddr + "." + dnsblService + ".";
 
            numDNSLookups++;
 
            totalDNSlookups[mailID]++;
-           updateRBLinfo(mailID);
+           updateDNSBLinfo(mailID);
 
-           DnsService.asyncResolve(rblQuery, 0, Listener, Thread);
+           DnsService.asyncResolve(dnsblQuery, 0, Listener, Thread);
        
         }
     }
@@ -432,9 +450,9 @@ function mydump(arr,level) {
     return dumped_text;
 }
 
-// Perform all RBL checks by calling doRBLcheck iteratively
-function doRBLchecks(relays, returnPath, mailID) {
-    var rblServices = [ 'zen.spamhaus.org',
+// Perform all DNSBL checks by calling doDNSBLcheck iteratively
+function doDNSBLchecks(relays, returnPath, mailID) {
+    var dnsblServices = [ 'zen.spamhaus.org',
 			'b.barracudacentral.org',
                         'dnsbl.abuse.ch',
                         'cbl.abuseat.org',
@@ -446,37 +464,95 @@ function doRBLchecks(relays, returnPath, mailID) {
                          .getService(Components.interfaces.nsIPrefService)
                          .getBranch("extensions.thundersec.");
 
-    // Do this for each of the RBL services
-    for (var i in rblServices) {
+    // Do this for each of the DNSBL services
+    for (var i in dnsblServices) {
         // Check if enabled in preferences
-        if ( pref.getBoolPref(rblServices[i]) ){
-            doRBLcheck (relays, rblServices[i], returnPath, mailID);
+        if ( pref.getBoolPref(dnsblServices[i]) ){
+            doDNSBLcheck (relays, dnsblServices[i], returnPath, mailID);
         }
     }
 
-    // Process Custom RBL if it is enabled
-    if ( pref.getBoolPref('custom_rbl_enabled') && pref.getCharPref('custom_rbl') ) {
-        var customRBLs = pref.getCharPref('custom_rbl').split(/\s*\,\s*|\s+/);
-        for (var i in customRBLs) {
-            doRBLcheck (relays, customRBLs[i], returnPath, mailID);
+    // Process Custom DNSBL if it is enabled
+    if ( pref.getBoolPref('custom_dnsbl_enabled') && pref.getCharPref('custom_dnsbl') ) {
+        var customDNSBLs = pref.getCharPref('custom_dnsbl').split(/\s*\,\s*|\s+/);
+        for (var i in customDNSBLs) {
+            doDNSBLcheck (relays, customDNSBLs[i], returnPath, mailID);
         }
     }
 
 }
 
+function parseAuthResults(input) {
+    var parts = new Array();
+    for(var i = 0, mark = ';', part = ''; 
+        i < input.length; 
+        i++) {
+
+        part += input[i];
+        if (input[i] == mark) { 
+            parts[parts.length] = part.trim().replace(/;$/, '').replace(/\s+/g, ' ');
+            part = '';
+        }
+        if (input[i] == '\"') {
+            mark = mark == ';' ? 'AA' : ';';
+        }
+    }
+    parts[parts.length] = part.trim().replace(/;$/, '').replace(/\s+/g, ' ');
+    return parts;
+}
+
+function isDKIMsuccess(authResults) {
+    for (let i in authResults) {
+        let item = authResults[i];
+        let match = item.match (/dkim=([^\s]+)/);
+        if ( (match) && 
+             (match[1] != 'pass') &&
+             (match[1] != 'none') ) {
+               // Try to extract reason but this is not foolproof
+               let match = item.match (/dkim=[^\s]+ \((.*?)\)/ );
+               let reason = '';
+               if (match) {
+                   reason=match[1];
+               }
+               return ( { pass: false, reason: reason } );
+         }
+    }
+    return ( { pass: true, reason: null } );
+}
+
+function isSPFsuccess(authResults) {
+    for (let i in authResults) {
+        let item = authResults[i];
+        let match = item.match (/spf=([^\s]+)/);
+        if ( (match) && 
+             (match[1] != 'pass') &&
+             (match[1] != 'neutral') &&
+             (match[1] != 'none') ) {
+               // Try to extract reason but this is not foolproof
+               let match = item.match (/spf=[^\s]+ \((.*?)\)/ );
+               let reason = '';
+               if (match) {
+                   reason=match[1];
+               }
+               return ( { pass: false, reason: reason } );
+         }
+    }
+    return ( { pass: true, reason: null } );
+}
+
 function pluginMain() {
     // Use the document URL as a unique email identifier 
-    var mailID = document.getElementById("messagepane").contentDocument.URL
+    var mailID = document.getElementById("messagepane").contentDocument.URL;
     currentMailID = mailID;
 			 
-    // Initialize RBLNotes
-    RBLNotes[mailID] = [];
+    // Initialize DNSBL
+    DNSBL[mailID] = [];
 
     // Initialize totalDNSlookups
     if (!totalDNSlookups[mailID]) {
         totalDNSlookups[mailID] = 0;
     }
-    updateRBLinfo(mailID);
+    updateDNSBLinfo(mailID);
 
     let msgHdr = gFolderDisplay.selectedMessage;
     MsgHdrToMimeMessage(msgHdr, null, function (aMsgHdr, aMimeMsg) {
@@ -490,6 +566,17 @@ function pluginMain() {
       // Some odd instances return multiple 'return-path's separated by comma 
       var returnPath =  aMimeMsg.headers['return-path'].join().split(',')[0];
 
+      // We will inspect the Authentication-Results header for DKIM and SPF
+      let authResults = aMimeMsg.headers['authentication-results'];
+      if (authResults) {
+          let authResultsArray = parseAuthResults(authResults);
+          DKIM[mailID] = isDKIMsuccess(authResultsArray);
+          SPF[mailID] = isSPFsuccess(authResultsArray);
+          if ( !DKIM[mailID].pass || !SPF[mailID].pass ) {
+              updateNotification (mailID);
+          }
+      }
+
       let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]
                       .createInstance(Components.interfaces.nsIDNSService);
 
@@ -501,7 +588,7 @@ function pluginMain() {
              numDNSLookups--;
 
              totalDNSlookups[mailID]--;
-             updateRBLinfo(mailID);
+             updateDNSBLinfo(mailID);
 
              if (Components.isSuccessCode(status)) {
                 while ( record && record.hasMore() ) {
@@ -520,7 +607,7 @@ function pluginMain() {
              }
 
              if (numDNSLookups == 0) {
-                 doRBLchecks (relays, returnPath, mailID);
+                 doDNSBLchecks (relays, returnPath, mailID);
              }
           }
       };
@@ -541,7 +628,7 @@ function pluginMain() {
                  numDNSLookups++;
 
                  totalDNSlookups[mailID]++;
-                 updateRBLinfo(mailID);
+                 updateDNSBLinfo(mailID);
 
                  DnsService.asyncResolve(relay, DnsService.RESOLVE_DISABLE_IPV6, Listener, Thread);
              }
@@ -549,7 +636,7 @@ function pluginMain() {
       }
 
       if (numDNSLookups == 0) {
-          doRBLchecks (relays, returnPath, mailID);
+          doDNSBLchecks (relays, returnPath, mailID);
       }
    }, true);
 }

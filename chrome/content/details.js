@@ -17,30 +17,113 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-function updateDetails() {
-   var RBLNotes = window.arguments[0].notes;
+function updateDNSBLtab(dnsbl) {
    var ip;
    var code;
    var ipLink;
    var codeLink;
 
-   var html = "<div style='text-align: center; padding: 20px; -moz-user-select: text;'>";
-   html = html + "IP addresses found in RBL databases";
-   html = html + "<table style='width: 400px; padding-top: 10px;'>";
-   html = html + "<tr><td style='font-weight: bold;'>IP Address</td><td style='font-weight: bold;'>Return Code</td><td style='font-weight: bold;'>Service</td></tr>";
-   for (var i in RBLNotes) {
-       ip = RBLNotes[i].ip;
-       code = RBLNotes[i].code;
-       service = RBLNotes[i].service;
-       html = html + "<tr><td>" + ip + "</td><td>" + code + "</td><td>" + service + "</td></tr>";
-   }   
-   html = html + "</table>";
+   if ( dnsbl.length > 0 ) {
+       document.getElementById("dnsblTab").label = "DNSBL (" + dnsbl.length + ")";
+   }
+
+   var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
+   if (dnsbl.length > 0) {
+       html = html + "<span style='font-size: 12pt; color: #9a0000; font-weight: bold;'>";
+       if (dnsbl.length == 1) {
+           html = html + dnsbl.length + " DNSBL violation";
+       }
+       else {
+           html = html + dnsbl.length + " DNSBL violations";
+       }
+       html = html + "</span>";
+       html = html + "<table style='width: 400px; padding-top: 10px;'>";
+       html = html + "<tr><td style='font-weight: bold;'>IP Address</td><td style='font-weight: bold;'>Return Code</td><td style='font-weight: bold;'>Service</td></tr>";
+       for (var i in dnsbl) {
+           ip = dnsbl[i].ip;
+           code = dnsbl[i].code;
+           service = dnsbl[i].service;
+           html = html + "<tr><td>" + ip + "</td><td>" + code + "</td><td>" + service + "</td></tr>";
+       }   
+       html = html + "</table>";
+   }
+   else {
+       html = html + "<p>No DNSBL violations.</p>";
+   }
    html = html + "</div>";
 
-   var container = document.getElementById("containerBox");
-   var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+   let container = document.getElementById("dnsblBox");
+   let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
+}
+
+function updateSPFtab(spf) {
+   if ( !spf.pass ) {
+       document.getElementById("spfTab").label = "SPF (1)";
+       document.getElementById("detailsTabs").selectedIndex = 1;
+   }
+
+   var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
+   if (spf.pass) {
+     html = html + "<p>No SPF failures</p>";
+   } 
+   else {
+     html = html + "<p style='font-size: 12pt; color: #9a0000; font-weight: bold;'>SPF Failure</p>";
+     if (spf.reason) {
+        html = html + "<p style='font-style: italic;'>" + spf.reason + "</p>";
+     }
+     else {
+        html = html + "<p>No explicit reason identified, please manually inspect e-mail headers.</p>";
+     }
+   }
+   html = html + "</div>";
+
+   let container = document.getElementById("spfBox");
+   let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
+function updateDKIMtab(dkim) {
+   if ( !dkim.pass ) {
+       document.getElementById("dkimTab").label = "DKIM (1)";
+       document.getElementById("detailsTabs").selectedIndex = 2;
+   }
+
+   var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
+   if (dkim.pass) {
+     html = html + "<p>No DKIM failures</p>";
+   } 
+   else {
+     html = html + "<p style='font-size: 12pt; color: #9a0000; font-weight: bold;'>DKIM Failure</p>";
+     if (dkim.reason) {
+        html = html + "<p style='font-style: italic;'>" + dkim.reason + "</p>";
+     }
+     else {
+        html = html + "<p>No explicit reason identified, please manually inspect e-mail headers.</p>";
+     }
+   }
+   html = html + "</div>";
+
+   let container = document.getElementById("dkimBox");
+   let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
+function updateDetails() {
+   var DNSBL = window.arguments[0].dnsbl;
+   var SPF = window.arguments[0].spf;
+   var DKIM = window.arguments[0].dkim;
+
+   updateDNSBLtab(DNSBL);
+   updateSPFtab(SPF);
+   updateDKIMtab(DKIM);
 }
