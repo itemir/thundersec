@@ -295,18 +295,18 @@ function updateNotification(mailID) {
    let notificationText = '';
 
    if ( DNSBL[currentMailID].length == 1 ) { 
-       notificationText = notificationText + "DNSBL failure. ";
+       notificationText = notificationText + "DNSBL violation. ";
    }
    else if ( DNSBL[currentMailID].length > 1 ) {
-       notificationText = notificationText + "Multiple DNSBL failures. ";
+       notificationText = notificationText + "Multiple DNSBL violations. ";
    }
 
    if ( !SPF[currentMailID].pass ) {
-      notificationText = notificationText + "SPF failure. ";
+      notificationText = notificationText + "SPF violation. ";
    }
 
    if ( !DKIM[currentMailID].pass ) {
-      notificationText = notificationText + "DKIM failure. ";
+      notificationText = notificationText + "DKIM violation. ";
    }
 
    notificationText = notificationText + "Please check Details for more information."
@@ -523,13 +523,13 @@ function isDKIMsuccess(authResults) {
 function isSPFsuccess(authResults) {
     for (let i in authResults) {
         let item = authResults[i];
-        let match = item.match (/spf=([^\s]+)/);
+        let match = item.match (/^([^\s]+)/);
         if ( (match) && 
-             (match[1] != 'pass') &&
-             (match[1] != 'neutral') &&
-             (match[1] != 'none') ) {
+             (match[1].toLowerCase() != 'pass') &&
+             (match[1].toLowerCase() != 'neutral') &&
+             (match[1].toLowerCase() != 'none') ) {
                // Try to extract reason but this is not foolproof
-               let match = item.match (/spf=[^\s]+ \((.*?)\)/ );
+               let match = item.match (/^[^\s]+ \((.*?)\)/ );
                let reason = '';
                if (match) {
                    reason=match[1];
@@ -566,15 +566,26 @@ function pluginMain() {
       // Some odd instances return multiple 'return-path's separated by comma 
       var returnPath =  aMimeMsg.headers['return-path'].join().split(',')[0];
 
-      // We will inspect the Authentication-Results header for DKIM and SPF
+      // We will inspect the Authentication-Results header for DKIM 
       let authResults = aMimeMsg.headers['authentication-results'];
       if (authResults) {
           let authResultsArray = parseAuthResults(authResults);
           DKIM[mailID] = isDKIMsuccess(authResultsArray);
-          SPF[mailID] = isSPFsuccess(authResultsArray);
-          if ( !DKIM[mailID].pass || !SPF[mailID].pass ) {
-              updateNotification (mailID);
-          }
+      } else {
+          DKIM[mailID] = { pass: true, reason: null };
+      }
+   
+      // We will inspect the Received-SPF header for SPF
+      let receivedSpfArray = aMimeMsg.headers['received-spf'];
+      if (receivedSpfArray) {
+          SPF[mailID] = isSPFsuccess(receivedSpfArray);
+      } else {
+          SPF[mailID] = { pass: true, reason: null };
+      }
+
+      // Update notification if either SPF or DKIM failed
+      if ( !DKIM[mailID].pass || !SPF[mailID].pass ) {
+          updateNotification (mailID);
       }
 
       let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]

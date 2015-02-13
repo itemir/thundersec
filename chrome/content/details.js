@@ -123,7 +123,8 @@ function updateDetails() {
    var SPF = window.arguments[0].spf;
    var DKIM = window.arguments[0].dkim;
 
-   updateDNSBLtab(DNSBL);
-   updateSPFtab(SPF);
+   // Reverse order defines the selected tab if multiple are active
    updateDKIMtab(DKIM);
+   updateSPFtab(SPF);
+   updateDNSBLtab(DNSBL);
 }
