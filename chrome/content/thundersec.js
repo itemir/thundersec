@@ -42,6 +42,32 @@ if ( !initialized) {
 }
 
 function initialize() {
+    // We will watch for application-quit
+    function quitObserver()
+    {
+       this.register();
+    }
+    quitObserver.prototype = {
+      observe: function(subject, topic, data) {
+         // This has to be an async request while application is quitting
+         // Or Thunderbird will quit before the $.post completes 
+         jQuery.ajaxSetup({async:false});
+         apiSendGenericStats();
+      },
+      register: function() {
+        var observerService = Components.classes["@mozilla.org/observer-service;1"]
+                              .getService(Components.interfaces.nsIObserverService);
+        observerService.addObserver(this, "quit-application", false);
+      },
+      unregister: function() {
+        var observerService = Components.classes["@mozilla.org/observer-service;1"]
+                                .getService(Components.interfaces.nsIObserverService);
+        observerService.removeObserver(this, "quit-application");
+      }
+    }
+
+    let observer = new quitObserver();
+
     // Add event listener
     var messagepane = document.getElementById("messagepane");
     messagepane.addEventListener('load', function () {
@@ -53,7 +79,6 @@ function initialize() {
     setInterval (apiCheckVersion, 24*60*60*1000);
 
     setInterval (apiSendGenericStats, STAT_INTERVAL);
-
 
     if (!connection) {
         Components.utils.import("resource://gre/modules/Sqlite.jsm");
