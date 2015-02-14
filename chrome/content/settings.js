@@ -23,3 +23,5 @@ const HOME_URL = 'https://github.com/itemir/thundersec';
 const DB_NAME = 'thundersec.sqlite';
 const API_URL = 'https://www.ilkertemir.com/thundersec/api/v1/';
 const VERSION = '0.1';
+// Send generic stats every hour
+const STAT_INTERVAL = 1*60*60*1000;

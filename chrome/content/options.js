@@ -42,7 +42,7 @@ function enableCustomDNSBL(item) {
 
 // Brings in whitelist popup
 function viewWhitelist() {
-    var features = "chrome, dialog, centerscreen, scrollbars, width=700, height=500";
+    var features = "chrome, dialog, centerscreen, scrollbars";
     window.openDialog("chrome://thundersec/content/whitelist.xul", "Whitelist", features);
 }
 
@@ -54,15 +54,12 @@ function clearWhitelist() {
           { path: DB_NAME }
       ).then(
           function onConnection(conn) {
-             conn.tableExists("WhiteList").then(
-                 function (exists) {
-                     conn.execute ("DELETE FROM WhiteList;");
-                     conn.close();
-                 }
-             );
-          }, // on Connection
-          function onError(error) {
-              alert (error);
+              conn.execute("BEGIN IMMEDIATE TRANSACTION");
+              conn.execute ("DELETE FROM dnsblWhiteList;");
+              conn.execute ("DELETE FROM spfWhiteList;");
+              conn.execute ("DELETE FROM dkimWhiteList;");
+              conn.execute("COMMIT TRANSACTION");
+              conn.close();
           }
       );
   }

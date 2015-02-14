@@ -21,6 +21,16 @@
 var DNSBL = {};
 var SPF = {};
 var DKIM = {};
+var stats = { periodStart: Date.now() / 1000,
+              periodEnd: null,
+              inspectTotal: 0,
+              dnsblLookup: 0,
+              dnsblViolation: 0,
+              dnsblWhitelist: 0,
+              spfViolation: 0,
+              spfWhitelist:0,
+              dkimViolation: 0,
+              dkimWhitelist: 0 };
 var totalDNSlookups = {};
 var currentMailID;
 var connection;
@@ -41,23 +51,46 @@ function initialize() {
     // Check new version now (in a minute) and then every day
     setTimeout (apiCheckVersion, 60*1000); 
     setInterval (apiCheckVersion, 24*60*60*1000);
-  
+
+    setInterval (apiSendGenericStats, STAT_INTERVAL);
+
+
     if (!connection) {
         Components.utils.import("resource://gre/modules/Sqlite.jsm");
         Sqlite.openConnection(
             { path: DB_NAME }
         ).then(
             function onConnection(conn) {
-               conn.tableExists("WhiteList").then(
+               // Set the global variable
+               connection = conn;
+
+               conn.tableExists("dnsblWhiteList").then(
                    function (exists) {
                        if (!exists) {
                            // This means, database has just been created. Create the table.
-                           createTable (conn);
+                           createDnsblTable (conn);
                        }
-                       // Set the global variable
-                       connection = conn;
                    }
                ); 
+
+               conn.tableExists("spfWhiteList").then(
+                   function (exists) {
+                       if (!exists) {
+                           // This means, database has just been created. Create the table.
+                           createSpfTable (conn);
+                       }
+                   }
+               ); 
+
+               conn.tableExists("dkimWhiteList").then(
+                   function (exists) {
+                       if (!exists) {
+                           // This means, database has just been created. Create the table.
+                           createDkimTable (conn);
+                       }
+                   }
+               ); 
+
             }, // on Connection
             function onError(error) {
                 alert (error);
@@ -85,9 +118,72 @@ function apiCheckVersion() {
     }, 'json');
 }
 
+// Sends generic statistics to the API
+function apiSendGenericStats() {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.thundersec.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // Set period end to now
+        stats.periodEnd = Date.now() / 1000;
+
+        // Add version information for the API
+        stats.version = VERSION;
+    
+        // Send stats
+        $.post (API_URL + 'stat', stats, function () {
+            // Reset stats, only on success
+            stats = { periodStart: Date.now() / 1000,
+                      periodEnd: null,
+                      inspectTotal: 0,
+                      dnsblLookup: 0,
+                      dnsblViolation: 0,
+                      dnsblWhitelist: 0,
+                      spfViolation: 0,
+                      spfWhitelist:0,
+                      dkimViolation: 0,
+                      dkimWhitelist: 0 };
+        });
+    }
+}
+
+function createDnsblTable(connection) {
+    let sql = " CREATE TABLE 'dnsblWhiteList' ( " +
+              "   'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+    	      "	  'ipAddress'	TEXT NOT NULL," +
+	      "   'dnsblSource'	TEXT NOT NULL," +
+	      "   'code'	TEXT NOT NULL," +
+	      "	  'sender'	TEXT NOT NULL," +
+              "   UNIQUE(ipAddress, dnsblSource, code, sender) ); ";
+
+    connection.execute (sql);
+}
+
+function createSpfTable(connection) {
+    let sql = " CREATE TABLE 'spfWhiteList' ( " +
+              "   'id'  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+              "   'reason'      TEXT NOT NULL," +
+              "   'sender'      TEXT NOT NULL," +
+              "    UNIQUE(reason, sender) ); ";
+
+    connection.execute (sql);
+}
+
+function createDkimTable(connection) {
+    let sql = " CREATE TABLE 'dkimWhiteList' ( " +
+              "   'id'  INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+              "   'reason'      TEXT NOT NULL," +
+              "   'sender'      TEXT NOT NULL," +
+              "    UNIQUE(reason, sender) ); ";
+
+    connection.execute (sql);
+}
+
 // Notify the API for crowd-sourced improvements
 // This should not send any sensitive information back
-function apiSendStats (ip, code, source) {
+function apiSendDnsblStats (ip, code, source) {
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                      .getService(Components.interfaces.nsIPrefService)
                      .getBranch("extensions.thundersec.");
@@ -194,37 +290,37 @@ function parseReceivedLine (receivedLine) {
    return addr;
 }
 
-function createTable(connection) {
-    var sql = 
-    sql = " CREATE TABLE 'WhiteList' ( " +
-          "       'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-    	  "	  'ipAddress'	TEXT NOT NULL," +
-	  " 	  'dnsblSource'	TEXT NOT NULL," +
-	  " 	  'code'	TEXT NOT NULL," +
-	  "	  'sender'	TEXT NOT NULL," +
-          "       UNIQUE(ipAddress, dnsblSource, code, sender) ); ";
-
-    connection.execute (sql);
-}
-
-function updateWhiteList(dnsblNotes) {
+function updateWhiteList(dnsbl, spf, dkim) {
     connection.execute("BEGIN IMMEDIATE TRANSACTION");
-    for (var i in dnsblNotes) {
-        let dnsblNote = dnsblNotes[i];
-        let values = [ dnsblNote.ip,
-                       dnsblNote.service, 
-                       dnsblNote.code,
-                       dnsblNote.sender ];
-        let sql = "INSERT OR IGNORE INTO WhiteList " +
+    for (var i in dnsbl) {
+        let values = [ dnsbl[i].ip,
+                       dnsbl[i].service, 
+                       dnsbl[i].code,
+                       dnsbl[i].sender ];
+        let sql = "INSERT OR IGNORE INTO dnsblWhiteList " +
                   "('ipAddress', 'dnsblSource', 'code', 'sender') " +
                   "VALUES (?, ?, ?, ?)";
         connection.execute(sql, values);
 
         // Notify the API for crowd-sourced improvements
-        apiSendWhiteList(dnsblNote.ip, 
-                         dnsblNote.code,
-                         dnsblNote.service,
-                         dnsblNote.sender);
+        apiSendWhiteList(dnsbl[i].ip, 
+                         dnsbl[i].code,
+                         dnsbl[i].service,
+                         dnsbl[i].sender);
+    }
+    if (!spf.pass) {
+        let values = [ spf.reason, spf.sender ];
+        let sql = "INSERT OR IGNORE INTO spfWhiteList " +
+                  "('reason', 'sender') " +
+                  "VALUES (?, ?)";
+        connection.execute(sql, values);
+    }
+    if (!dkim.pass) {
+        let values = [ dkim.reason, dkim.sender ];
+        let sql = "INSERT OR IGNORE INTO dkimWhiteList " +
+                  "('reason', 'sender') " +
+                  "VALUES (?, ?)";
+        connection.execute(sql, values);
     }
     connection.execute("COMMIT TRANSACTION");
 }
@@ -236,7 +332,7 @@ function markAsLegitimate(notf, desc) {
                                   "reason in the future.");
     if (confirm) {
         // We need to pass the DNSBL here, otherwise it will be reset before the database is processed
-        updateWhiteList( DNSBL[currentMailID] );
+        updateWhiteList( DNSBL[currentMailID], SPF[currentMailID], DKIM[currentMailID] );
     } else {
         throw new Error('Preventing notification bar from closing.'); 
     }
@@ -292,21 +388,48 @@ function updateNotification(mailID) {
        notificationBox.removeCurrentNotification();
    }
 
-   let notificationText = '';
+
+   let violations = [];
+   let plural = false;
 
    if ( DNSBL[currentMailID].length == 1 ) { 
-       notificationText = notificationText + "DNSBL violation. ";
+       violations.push ("DNSBL");
    }
    else if ( DNSBL[currentMailID].length > 1 ) {
-       notificationText = notificationText + "Multiple DNSBL violations. ";
+       violations.push ("Multiple DNSBL");
+       plural = true;
    }
 
    if ( !SPF[currentMailID].pass ) {
-      notificationText = notificationText + "SPF violation. ";
+      violations.push ("SPF");
    }
 
    if ( !DKIM[currentMailID].pass ) {
-      notificationText = notificationText + "DKIM violation. ";
+      violations.push ("DKIM");
+   }
+
+   let notificationText = '';
+   
+   if ( violations.length == 1 ) {
+       if (plural) {
+           notificationText = notificationText + 
+                              violations[0] + ' violations. ';
+       }
+       else {
+           notificationText = notificationText +
+                              violations[0] + ' violation. ';
+       }
+   }
+   if ( violations.length == 2 ) {
+       notificationText = notificationText + 
+                          violations[0] + ' and ' +  
+                          violations[1] + ' violations. ';
+   }
+   if ( violations.length == 3 ) {
+       notificationText = notificationText + 
+                          violations[0] + ', ' +  
+                          violations[1] + ' and ' +  
+                          violations[2] + ' violations. ';
    }
 
    notificationText = notificationText + "Please check Details for more information."
@@ -365,9 +488,12 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
 
                if (Components.isSuccessCode(status)) {
                    while ( record && record.hasMore() ) {
+                       // Update stats
+                       stats.dnsblViolation++;
+
                        resolvedAddr = record.getNextAddrAsString();
                        // This query HAS TO return only a single row
-                       let sql = "SELECT COUNT(id) as cnt FROM WhiteList " +
+                       let sql = "SELECT COUNT(id) as cnt FROM dnsblWhiteList " +
                                  "WHERE ipAddress=? AND dnsblSource=? AND code=? AND sender=?";
                        let values = [ addr,
                                       dnsblService,
@@ -384,10 +510,12 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
 			        			 service: dnsblService, 
                                                          code: resolvedAddr,
                                                          sender: returnPath } );
-                               apiSendStats (addr, resolvedAddr, dnsblService);
+                               apiSendDnsblStats (addr, resolvedAddr, dnsblService);
                                safeMail = false;
                            } else {
                                // Previously white listed
+                               // Update stats
+                               stats.dnsblWhitelist++;
                            }
                            // Make sure we finished all lookups, both DNS and SQL
                            if ( numSQLLookups == 0 ) {
@@ -413,6 +541,9 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
         if (match) {
            reverseAddr = match[4] + "." + match[3] + "." + match[2] + "." + match[1];
            dnsblQuery = reverseAddr + "." + dnsblService + ".";
+
+           // Update stats
+           stats.dnsblLookup++;
 
            numDNSLookups++;
 
@@ -501,26 +632,56 @@ function parseAuthResults(input) {
     return parts;
 }
 
-function isDKIMsuccess(authResults) {
+function isDKIMsuccess(authResults, sender, mailID) {
+    DKIM[mailID] = { pass: true,
+                     reason: null,
+                     sender: sender };
+
     for (let i in authResults) {
         let item = authResults[i];
         let match = item.match (/dkim=([^\s]+)/);
         if ( (match) && 
              (match[1] != 'pass') &&
              (match[1] != 'none') ) {
+               // Update stats
+               stats.dkimViolation++;
+
                // Try to extract reason but this is not foolproof
                let match = item.match (/dkim=[^\s]+ \((.*?)\)/ );
                let reason = '';
                if (match) {
                    reason=match[1];
                }
-               return ( { pass: false, reason: reason } );
-         }
-    }
-    return ( { pass: true, reason: null } );
+               // Check if previously white-listed
+               let sql = "SELECT COUNT(id) as cnt FROM dkimWhiteList " +
+                         "WHERE reason=? AND sender=?";
+               let values = [ reason,
+                              sender ];
+
+               connection.execute(sql, values, function(row) {
+                 // This will be 1 for existing records, 0 for non-existent ones
+                 let count = row.getResultByName('cnt');
+                 if (count == 0) {
+                     DKIM[mailID] = { pass: false, 
+                                      reason: reason,
+                                      sender: sender };
+                     updateNotification (mailID);
+                 }
+                 else {
+                    // White-listed
+                    // Update stats
+                    stats.dkimWhitelist++;
+                 }
+               });
+         } // if match 
+    } // for
 }
 
-function isSPFsuccess(authResults) {
+function isSPFsuccess(authResults, sender, mailID) {
+    SPF[mailID] = { pass: true, 
+                    reason: null,
+                    sender: sender };
+
     for (let i in authResults) {
         let item = authResults[i];
         let match = item.match (/^([^\s]+)/);
@@ -528,23 +689,47 @@ function isSPFsuccess(authResults) {
              (match[1].toLowerCase() != 'pass') &&
              (match[1].toLowerCase() != 'neutral') &&
              (match[1].toLowerCase() != 'none') ) {
+               // Update stats
+               stats.spfViolation++;
+
                // Try to extract reason but this is not foolproof
                let match = item.match (/^[^\s]+ \((.*?)\)/ );
-               let reason = '';
+               let reason = null;
                if (match) {
                    reason=match[1];
                }
-               return ( { pass: false, reason: reason } );
+
+               // Check if previously white-listed
+               let sql = "SELECT COUNT(id) as cnt FROM spfWhiteList " +
+                         "WHERE reason=? AND sender=?";
+               let values = [ reason,
+                              sender ];
+
+               connection.execute(sql, values, function(row) {
+                 // This will be 1 for existing records, 0 for non-existent ones
+                 let count = row.getResultByName('cnt');
+                 if (count == 0) {
+                     SPF[mailID] = { pass: false, 
+                                     reason: reason,
+                                     sender: sender };
+                     updateNotification (mailID);
+                 }
+                 else {
+                    // White-listed
+                    // Update stats
+                    stats.spfWhitelist++;
+                 }
+               });
          }
     }
-    return ( { pass: true, reason: null } );
 }
 
 function pluginMain() {
     // Use the document URL as a unique email identifier 
     var mailID = document.getElementById("messagepane").contentDocument.URL;
+
     currentMailID = mailID;
-			 
+
     // Initialize DNSBL
     DNSBL[mailID] = [];
 
@@ -556,6 +741,9 @@ function pluginMain() {
 
     let msgHdr = gFolderDisplay.selectedMessage;
     MsgHdrToMimeMessage(msgHdr, null, function (aMsgHdr, aMimeMsg) {
+       // Update counters
+      stats.inspectTotal++;
+			 
       var relay = null;
       var relays = [];
       var addr;
@@ -570,22 +758,20 @@ function pluginMain() {
       let authResults = aMimeMsg.headers['authentication-results'];
       if (authResults) {
           let authResultsArray = parseAuthResults(authResults);
-          DKIM[mailID] = isDKIMsuccess(authResultsArray);
+
+          // Updates DKIM[mailID]
+          isDKIMsuccess(authResultsArray, returnPath, mailID);
       } else {
-          DKIM[mailID] = { pass: true, reason: null };
+          DKIM[mailID] = { pass: true, reason: null, sender: null };
       }
    
       // We will inspect the Received-SPF header for SPF
       let receivedSpfArray = aMimeMsg.headers['received-spf'];
       if (receivedSpfArray) {
-          SPF[mailID] = isSPFsuccess(receivedSpfArray);
+          // Updates SPF[mailID]
+          isSPFsuccess(receivedSpfArray, returnPath, mailID);
       } else {
-          SPF[mailID] = { pass: true, reason: null };
-      }
-
-      // Update notification if either SPF or DKIM failed
-      if ( !DKIM[mailID].pass || !SPF[mailID].pass ) {
-          updateNotification (mailID);
+          SPF[mailID] = { pass: true, reason: null, sender: null };
       }
 
       let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]

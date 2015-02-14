@@ -17,8 +17,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-function updateWhitelistTable(whitelist) {
-   var html = "<div style='width: 660px; height: 450px; overflow: scroll;'>";
+function updateDnsblWhitelist(whitelist) {
+   var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
    
    if (whitelist.length) {
        html = html + "<table style='width: 100%; padding-top: 10px;'>";
@@ -44,14 +44,14 @@ function updateWhitelistTable(whitelist) {
 
        html = html + "</table>";
    } else {
-       html = html + "<div style='text-align: center; padding-top: 60px; font-size: 14pt;'>";
-       html = html + "Your whitelist is currently empty.";
-       html = html + "</div>";
+       html = html + "<p style='text-align: center; padding-top: 60px; font-size: 10pt;'>";
+       html = html + "DNSBL whitelist is empty";
+       html = html + "</p>";
    }
 
    html = html + "</div>";
 
-   var container = document.getElementById("whitelistBox");
+   var container = document.getElementById("dnsblWhitelistBox");
    var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
    divHTML.innerHTML = html;
@@ -59,12 +59,12 @@ function updateWhitelistTable(whitelist) {
    container.appendChild(divHTML);
 }
 
-function queryWhitelist(conn) {
+function queryDnsblWhitelist(conn) {
    var whiteList = [];
 
-   conn.tableExists("WhiteList").then(
+   conn.tableExists("dnsblWhiteList").then(
        function (exists) {
-           let sql = 'SELECT * FROM WhiteList';
+           let sql = 'SELECT * FROM dnsblWhiteList';
            conn.execute (sql, null, function(row) {
               let ip = row.getResultByName('ipAddress');
               let source = row.getResultByName('dnsblSource');
@@ -77,8 +77,139 @@ function queryWhitelist(conn) {
                                  sender: sender } );
            }).then(
               function onStatementComplete(result) {
-                  updateWhitelistTable(whiteList);
-                  conn.close();
+                  if (whiteList.length) {
+                      document.getElementById("dnsblTab").label = "DNSBL (" + whiteList.length + ")";
+                  }
+                  updateDnsblWhitelist(whiteList);
+              },
+              function onError(err) {
+                  alert ('SQL query failed: ' + err);
+              }
+           );
+       }
+   );
+}
+
+function updateSpfWhitelist(whitelist) {
+   var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
+   
+   if (whitelist.length) {
+       html = html + "<table style='width: 100%; padding-top: 10px;'>";
+       html = html + "<tr><td style='font-weight: bold;'>Reason</td>" +
+                     "<td style='font-weight: bold;'>Sender</td></tr>";
+    
+       for (var i in whitelist) {
+           let reason = whitelist[i].reason; 
+           let sender = whitelist[i].sender; 
+           // Easy way of escaping with jQuery
+           reason = $('<span/>').text(reason).html();
+           sender = $('<span/>').text(sender).html();
+    
+           html = html + "<tr><td style='padding: 5px;'>" + reason + 
+                         "</td><td style='padding: 5px;'>" + sender + 
+                         "</td></tr>";
+       }   
+
+       html = html + "</table>";
+   } else {
+       html = html + "<p style='text-align: center; padding-top: 60px; font-size: 10pt;'>";
+       html = html + "SPF whitelist is empty";
+       html = html + "</p>";
+   }
+
+   html = html + "</div>";
+
+   var container = document.getElementById("spfWhitelistBox");
+   var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
+function querySpfWhitelist(conn) {
+   var whiteList = [];
+
+   conn.tableExists("spfWhiteList").then(
+       function (exists) {
+           let sql = 'SELECT * FROM spfWhiteList';
+           conn.execute (sql, null, function(row) {
+              let reason = row.getResultByName('reason');
+              let sender = row.getResultByName('sender');
+
+              whiteList.push ( { reason: reason,
+                                 sender: sender } );
+           }).then(
+              function onStatementComplete(result) {
+                  if (whiteList.length) {
+                      document.getElementById("spfTab").label = "SPF (" + whiteList.length + ")";
+                  }
+                  updateSpfWhitelist(whiteList);
+              },
+              function onError(err) {
+                  alert ('SQL query failed: ' + err);
+              }
+           );
+       }
+   );
+}
+
+
+function updateDkimWhitelist(whitelist) {
+   var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
+   
+   if (whitelist.length) {
+       html = html + "<table style='width: 100%; padding-top: 10px;'>";
+       html = html + "<tr><td style='font-weight: bold;'>Reason</td>" +
+                     "<td style='font-weight: bold;'>Sender</td></tr>";
+    
+       for (var i in whitelist) {
+           let reason = whitelist[i].reason; 
+           let sender = whitelist[i].sender; 
+           // Easy way of escaping with jQuery
+           reason = $('<span/>').text(reason).html();
+           sender = $('<span/>').text(sender).html();
+    
+           html = html + "<tr><td style='padding: 5px;'>" + reason + 
+                         "</td><td style='padding: 5px;'>" + sender + 
+                         "</td></tr>";
+       }   
+
+       html = html + "</table>";
+   } else {
+       html = html + "<p style='text-align: center; padding-top: 60px; font-size: 10pt;'>";
+       html = html + "DKIM whitelist is empty";
+       html = html + "</p>";
+   }
+
+   html = html + "</div>";
+
+   var container = document.getElementById("dkimWhitelistBox");
+   var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
+function queryDkimWhitelist(conn) {
+   var whiteList = [];
+
+   conn.tableExists("dkimWhiteList").then(
+       function (exists) {
+           let sql = 'SELECT * FROM dkimWhiteList';
+           conn.execute (sql, null, function(row) {
+              let reason = row.getResultByName('reason');
+              let sender = row.getResultByName('sender');
+
+              whiteList.push ( { reason: reason,
+                                 sender: sender } );
+           }).then(
+              function onStatementComplete(result) {
+                  if (whiteList.length) {
+                      document.getElementById("dkimTab").label = "DKIM (" + whiteList.length + ")";
+                  }
+                  updateDkimWhitelist(whiteList);
               },
               function onError(err) {
                   alert ('SQL query failed: ' + err);
@@ -94,7 +225,14 @@ function viewWhitelist() {
        { path: DB_NAME }
    ).then(
        function onConnection(conn) {
-           queryWhitelist(conn);
+           queryDnsblWhitelist(conn);
+           querySpfWhitelist(conn);
+           queryDkimWhitelist(conn);
+           // Give a second then close the connection
+           // There should be a better way to do it 
+           setTimeout (function() {
+               conn.close();
+           }, 1000);
        }, 
        function onError(error) {
            alert ('Connection failed: ' + error);

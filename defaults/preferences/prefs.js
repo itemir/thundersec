@@ -8,8 +8,8 @@ pref("extensions.thundersec.bl.spamcop.net", false);
 pref("extensions.thundersec.dnsbl.sorbs.net", false);
 
 // For custom RBL
-pref("extensions.thundersec.custom_rbl_enabled", false);
-pref("extensions.thundersec.custom_rbl", "dnsbl.example.com");
+pref("extensions.thundersec.custom_dnsbl_enabled", false);
+pref("extensions.thundersec.custom_dnsbl", "dnsbl.example.com");
 
 // Advanced settings
 pref("extensions.thundersec.api_enabled", true);

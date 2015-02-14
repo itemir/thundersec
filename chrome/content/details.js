@@ -25,6 +25,7 @@ function updateDNSBLtab(dnsbl) {
 
    if ( dnsbl.length > 0 ) {
        document.getElementById("dnsblTab").label = "DNSBL (" + dnsbl.length + ")";
+       document.getElementById("detailsTabs").selectedIndex = 0;
    }
 
    var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
