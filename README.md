@@ -7,10 +7,10 @@ Whitelists can be used to mark DNSBL, DKIM and SPF violations as legitimate for 
 
 The source code and issue tracker for this extension is hosted at GitHub at the following URL:
 
-    https://github.com/itemir/thundersec
+https://github.com/itemir/thundersec
 
 ## Installation Instructions
 
 ThunderSec installation instructions are available at the following URL:
 
-    https://github.com/itemir/thundersec/wiki/ThunderSec-Installation-Instructions
+https://github.com/itemir/thundersec/wiki/ThunderSec-Installation-Instructions
