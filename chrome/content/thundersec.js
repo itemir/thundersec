@@ -137,7 +137,7 @@ function apiCheckVersion() {
                           'Would you like to download?';
  
             if ( window.confirm (message) ) {
-                window.open (HOME_URL,'','chrome,centerscreen');
+                window.open (data['url'],'','chrome,centerscreen');
             }
         }
     }, 'json');
