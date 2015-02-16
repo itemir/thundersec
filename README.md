@@ -11,6 +11,10 @@ The source code and issue tracker for this extension is hosted at GitHub at the 
 
 https://github.com/itemir/thundersec
 
+The add-on can be found on Mozilla Add-ons page at tge following UR:
+
+https://addons.mozilla.org/en-US/thunderbird/addon/thundersec/
+
 ## Installation Instructions
 
 ThunderSec installation instructions are available at the following URL:
