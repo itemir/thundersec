@@ -1,6 +1,8 @@
 # ThunderSec for Mozilla Thunderbird
 
-<img style='float: left; height: 150px; width: 150px;'  src='https://raw.githubusercontent.com/itemir/thundersec/master/chrome/content/images/thundersec.png'>
+<div style='float: left;'>
+![ThunderSec](https://raw.githubusercontent.com/itemir/thundersec/master/chrome/content/images/thundersec.png)
+</div>
 ThunderSec is a security extension for Mozilla Thunderbird that creates several pieces of additional security functionality. These security features include DNS-based Blackhole List (DNSBL) and Realtime Blackhole List (RBL) support for popular services such as Spamhaus, Composite Blocking List (CBL), SpamCop and Sorbs. Additionally, you can define custom DNSBL and RBL services of your choosing.
 
 ThunderSec also introduces client-side checks for DomainKeys Identified Mail (DKIM) and Sender Policy Framework (SPF) violations. 
