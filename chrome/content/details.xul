@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog title="Details" orient="vertical" autostretch="always" onload="updateDetails();" buttons="accept" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="chrome://thundersec/content/jquery-1.11.2.min.js" />
   <script type="application/javascript" src="chrome://thundersec/content/details.js"/>
   <tabbox id="detailsTabs" selectedIndex="0">
     <tabs>

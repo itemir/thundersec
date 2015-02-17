@@ -216,7 +216,6 @@ function apiSendDnsblStats (ip, code, source) {
     // Check if API usage is allowed in preferences
     if ( pref.getBoolPref('api_enabled') ) {
         // We will hash the sender for privacy
-        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
         $.post( API_URL + 'dnsbl/stat',
                { 'ip': ip,
                  'code': code,
@@ -236,11 +235,12 @@ function apiSendWhiteList(ip, code, source,sender) {
     if ( pref.getBoolPref('api_enabled') ) {
         // We will hash the sender for privacy
         // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        let sha256Hash = CryptoJS.SHA256 (sender).toString(CryptoJS.enc.Hex);
         $.post( API_URL + 'dnsbl/whitelist',
                { 'ip': ip,
                  'code': code,
                  'dnsbl': source,
-                 'senderHash': Sha256.hash (sender),
+                 'senderHash': sha256Hash,
                  'version': VERSION } );
     }
 }

@@ -17,6 +17,12 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+function sanitizeInput (inputText) {
+    // Easy way of escaping with jQuery
+   let returnText = $('<span/>').text(inputText).html();
+   return (returnText);
+}
+
 function updateDnsblWhitelist(whitelist) {
    var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
    
@@ -28,12 +34,10 @@ function updateDnsblWhitelist(whitelist) {
                      "<td style='font-weight: bold;'>Sender</td></tr>";
     
        for (var i in whitelist) {
-           let ip = whitelist[i].ip; 
-           let source = whitelist[i].source; 
-           let code = whitelist[i].code; 
-           let sender = whitelist[i].sender; 
-           // Easy way of escaping with jQuery
-           sender = $('<span/>').text(sender).html();
+           let ip = sanitizeInput (whitelist[i].ip); 
+           let source = sanitizeInput (whitelist[i].source); 
+           let code = sanitizeInput (whitelist[i].code); 
+           let sender = sanitizeInput (whitelist[i].sender); 
     
            html = html + "<tr><td style='padding: 5px;'>" + ip + 
                          "</td><td style='padding: 5px;'>" + source + 
@@ -54,6 +58,9 @@ function updateDnsblWhitelist(whitelist) {
    var container = document.getElementById("dnsblWhitelistBox");
    var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
@@ -99,11 +106,8 @@ function updateSpfWhitelist(whitelist) {
                      "<td style='font-weight: bold;'>Sender</td></tr>";
     
        for (var i in whitelist) {
-           let reason = whitelist[i].reason; 
-           let sender = whitelist[i].sender; 
-           // Easy way of escaping with jQuery
-           reason = $('<span/>').text(reason).html();
-           sender = $('<span/>').text(sender).html();
+           let reason = sanitizeInput (whitelist[i].reason); 
+           let sender = sanitizeInput (whitelist[i].sender); 
     
            html = html + "<tr><td style='padding: 5px;'>" + reason + 
                          "</td><td style='padding: 5px;'>" + sender + 
@@ -122,6 +126,9 @@ function updateSpfWhitelist(whitelist) {
    var container = document.getElementById("spfWhitelistBox");
    var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
@@ -164,11 +171,8 @@ function updateDkimWhitelist(whitelist) {
                      "<td style='font-weight: bold;'>Sender</td></tr>";
     
        for (var i in whitelist) {
-           let reason = whitelist[i].reason; 
-           let sender = whitelist[i].sender; 
-           // Easy way of escaping with jQuery
-           reason = $('<span/>').text(reason).html();
-           sender = $('<span/>').text(sender).html();
+           let reason = sanitizeInput (whitelist[i].reason); 
+           let sender = sanitizeInput (whitelist[i].sender); 
     
            html = html + "<tr><td style='padding: 5px;'>" + reason + 
                          "</td><td style='padding: 5px;'>" + sender + 
@@ -187,6 +191,9 @@ function updateDkimWhitelist(whitelist) {
    var container = document.getElementById("dkimWhitelistBox");
    var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);

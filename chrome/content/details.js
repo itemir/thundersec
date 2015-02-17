@@ -17,6 +17,12 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+function sanitizeInput (inputText) {
+    // Easy way of escaping with jQuery
+   let returnText = $('<span/>').text(inputText).html();
+   return (returnText);
+}
+
 function updateDNSBLtab(dnsbl) {
    var ip;
    var code;
@@ -41,9 +47,9 @@ function updateDNSBLtab(dnsbl) {
        html = html + "<table style='width: 400px; padding-top: 10px;'>";
        html = html + "<tr><td style='font-weight: bold;'>IP Address</td><td style='font-weight: bold;'>Return Code</td><td style='font-weight: bold;'>Service</td></tr>";
        for (var i in dnsbl) {
-           ip = dnsbl[i].ip;
-           code = dnsbl[i].code;
-           service = dnsbl[i].service;
+           ip = sanitizeInput (dnsbl[i].ip);
+           code = sanitizeInput (dnsbl[i].code);
+           service = sanitizeInput (dnsbl[i].service);
            html = html + "<tr><td>" + ip + "</td><td>" + code + "</td><td>" + service + "</td></tr>";
        }   
        html = html + "</table>";
@@ -56,6 +62,9 @@ function updateDNSBLtab(dnsbl) {
    let container = document.getElementById("dnsblBox");
    let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input 
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
@@ -74,7 +83,8 @@ function updateSPFtab(spf) {
    else {
      html = html + "<p style='font-size: 12pt; color: #9a0000; font-weight: bold;'>SPF Failure</p>";
      if (spf.reason) {
-        html = html + "<p style='font-style: italic;'>" + spf.reason + "</p>";
+        let reason = sanitizeInput (spf.reason);
+        html = html + "<p style='font-style: italic;'>" + reason + "</p>";
      }
      else {
         html = html + "<p>No explicit reason identified, please manually inspect e-mail headers.</p>";
@@ -85,6 +95,10 @@ function updateSPFtab(spf) {
    let container = document.getElementById("spfBox");
    let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
@@ -103,7 +117,8 @@ function updateDKIMtab(dkim) {
    else {
      html = html + "<p style='font-size: 12pt; color: #9a0000; font-weight: bold;'>DKIM Failure</p>";
      if (dkim.reason) {
-        html = html + "<p style='font-style: italic;'>" + dkim.reason + "</p>";
+        let reason = sanitizeInput (dkim.reason);
+        html = html + "<p style='font-style: italic;'>" + reason + "</p>";
      }
      else {
         html = html + "<p>No explicit reason identified, please manually inspect e-mail headers.</p>";
@@ -114,6 +129,9 @@ function updateDKIMtab(dkim) {
    let container = document.getElementById("dkimBox");
    let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
 
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
    divHTML.innerHTML = html;
 
    container.appendChild(divHTML);
