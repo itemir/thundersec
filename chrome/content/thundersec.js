@@ -667,6 +667,7 @@ function isDKIMsuccess(authResults, sender, mailID) {
         let match = item.match (/dkim=([^\s]+)/);
         if ( (match) && 
              (match[1] != 'pass') &&
+             (match[1] != 'neutral') &&
              (match[1] != 'none') ) {
                // Update stats
                stats.dkimViolation++;
