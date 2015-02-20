@@ -776,9 +776,23 @@ function pluginMain() {
       var numDNSLookups = 0;
       var temp = 0;
 
-      // This comes back as an array, we want it as string
-      // Some odd instances return multiple 'return-path's separated by comma 
-      var returnPath =  aMimeMsg.headers['return-path'].join().split(',')[0];
+      // Return-Path should exist in all messages per RFC but it doesn't
+      // See Issue #13 on GitHub
+      if ('return-path' in aMimeMsg.headers) {
+          // This comes back as an array, we want it as string
+          // Some odd instances return multiple 'return-path's separated by comma 
+          var returnPath =  aMimeMsg.headers['return-path'].join().split(',')[0];
+      }
+      else {
+          var returnPath =  aMimeMsg.headers['from'].join().split(',')[0];;
+      }
+
+      // Addresses show up as sender@example.com, <sender@example.com> or Sender <sender@example.com>
+      // We need to normalize it
+      let match = returnPath.match(/<([^>]+)>/);
+      if (match) {
+          returnPath = match[1];
+      }
 
       // We will inspect the Authentication-Results header for DKIM 
       let authResults = aMimeMsg.headers['authentication-results'];
