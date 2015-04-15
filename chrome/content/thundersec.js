@@ -765,7 +765,16 @@ function pluginMain() {
     }
     updateDNSBLinfo(mailID);
 
+    if (!gFolderDisplay) {
+      return
+    }
+
     let msgHdr = gFolderDisplay.selectedMessage;
+
+    if (!msgHdr) {
+      return
+    }
+ 
     MsgHdrToMimeMessage(msgHdr, null, function (aMsgHdr, aMimeMsg) {
        // Update counters
       stats.inspectTotal++;
