@@ -3,7 +3,7 @@
 <dialog title="DNSBL, SPF and DKIM Whitelists" orient="vertical" autostretch="always" onload="viewWhitelist();" buttons="accept" width="600" height="500" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/javascript" src="chrome://thundersec/content/settings.js"/>
   <script type="application/javascript" src="chrome://thundersec/content/whitelist.js"/>
-  <script src="chrome://thundersec/content/jquery-1.11.2.min.js" />
+  <script src="chrome://thundersec/content/jquery-2.1.4.min.js" />
   <tabbox id="detailsTabs" selectedIndex="0">
     <tabs>
       <tab id='dnsblTab' label="DNSBL"/>
