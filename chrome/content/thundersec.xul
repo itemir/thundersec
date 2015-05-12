@@ -2,7 +2,7 @@
 <!DOCTYPE overlay SYSTEM "chrome://thundersec/locale/overlay.dtd">
 <overlay id="thundersec-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
    <script src="chrome://thundersec/content/settings.js" />
-   <script src="chrome://thundersec/content/jquery-1.11.2.min.js" />
+   <script src="chrome://thundersec/content/jquery-2.1.4.min.js" />
    <script src="chrome://thundersec/content/thundersec.js" />
    <script src="chrome://thundersec/content/version_compare.js" />
    <script src="chrome://thundersec/content/sha256.js" />
