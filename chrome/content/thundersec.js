@@ -49,6 +49,8 @@ function initialize() {
     }
     quitObserver.prototype = {
       observe: function(subject, topic, data) {
+         // Close the database connection
+         connection.close();
          // This has to be an async request while application is quitting
          // Or Thunderbird will quit before the $.post completes 
          jQuery.ajaxSetup({async:false});
