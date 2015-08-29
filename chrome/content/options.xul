@@ -16,6 +16,7 @@
       <preference id="custom_dnsbl_enabled" name="extensions.thundersec.custom_dnsbl_enabled" type="bool"/>
       <preference id="custom_dnsbl" name="extensions.thundersec.custom_dnsbl" type="string"/>
 
+      <preference id="auto_junk_enabled" name="extensions.thundersec.auto_junk_enabled" type="bool"/>
       <preference id="api_enabled" name="extensions.thundersec.api_enabled" type="bool"/>
     </preferences>
     <tabbox id="optionsTabs" selectedIndex="0">
@@ -39,19 +40,13 @@
               <hbox>
                  <checkbox id="checkbool.custom_dnsbl_enabled" preference="custom_dnsbl_enabled" label="" onclick="enableCustomDNSBL(this);" />
                  <textbox id="string.custom_dnsbl" preference="custom_dnsbl" onclick="clearInput();"/>
-                 <script>
-                     if ( document.getElementById("checkbool.custom_dnsbl_enabled").checked ) {
-                         document.getElementById("string.custom_dnsbl").removeAttribute("disabled");
-                     } else {
-                         document.getElementById("string.custom_dnsbl").setAttribute("disabled", true);
-                     }
-                 </script>
               </hbox>
             </vbox>
           </hbox>
         </tabpanel>
         <tabpanel>
            <vbox style='width: 100%;'>
+             <checkbox id="checkbool.auto_junk_enabled" preference="auto_junk_enabled" label="Automatically mark messages as Junk if they fail DNSBL, DKIM or SPF checks." />
              <checkbox id="checkbool.api_enabled" preference="api_enabled" label="Send sanitized information to the cloud for improved results." />
              <separator/>
              <hbox pack='center'>
@@ -63,4 +58,11 @@
       </tabpanels>
     </tabbox>
   </prefpane>
+  <script>
+      if ( document.getElementById("checkbool.custom_dnsbl_enabled").checked ) {
+          document.getElementById("string.custom_dnsbl").removeAttribute("disabled");
+      } else {
+          document.getElementById("string.custom_dnsbl").setAttribute("disabled", true);
+      }
+  </script>
 </prefwindow>

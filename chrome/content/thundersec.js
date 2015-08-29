@@ -32,6 +32,7 @@ var stats = { periodStart: Date.now() / 1000,
               dkimViolation: 0,
               dkimWhitelist: 0 };
 var totalDNSlookups = {};
+var autoJunked = [];
 var currentMailID;
 var connection;
 var initialized = false;
@@ -352,6 +353,11 @@ function updateWhiteList(dnsbl, spf, dkim) {
     connection.execute("COMMIT TRANSACTION");
 }
 
+function markAsJunk(notf, desc) {
+    // This will mark the message as Junk
+    gDBView.doCommand(Components.interfaces.nsMsgViewCommandType.junk);
+}
+
 function markAsLegitimate(notf, desc) {
     var confirm = window.confirm ("Are you sure to mark this e-mail as legitimate?\n\n" + 
                                   "This will be remembered and similar messages from " +
@@ -385,7 +391,34 @@ function optionsBox(notf, desc) {
 
 function updateNotification(mailID) {
    if (mailID != currentMailID) { 
-       // User has moved on, don't updae the notificationbox
+       // User has moved on, don't update the notificationbox
+       return;
+   }
+ 
+   // This feels redundant but necessary
+   let msgHdr = gFolderDisplay.selectedMessage;
+
+   if (!msgHdr) {
+       return
+   }
+
+   var junkScore = msgHdr.getStringProperty("junkscore");
+   var isJunk = (junkScore == Components.interfaces.nsIJunkMailPlugin.IS_SPAM_SCORE);
+
+   // If already marked as Junk, don't display the banner
+   if (isJunk) {
+       return
+   }
+
+   var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefService)
+                        .getBranch("extensions.thundersec.");
+
+   // Check if auto-junk feature is enabled
+   if ( ( pref.getBoolPref('auto_junk_enabled') ) && ( autoJunked.indexOf(mailID) == -1 ) ) {
+       // We auto-junk a message only once, the rest is for the user
+       autoJunked.push(mailID); 
+       gDBView.doCommand(Components.interfaces.nsMsgViewCommandType.junk);
        return;
    }
 
@@ -395,6 +428,12 @@ function updateNotification(mailID) {
        accessKey: 'D',
        popup: null,
        callback: detailsBox
+     },
+     {
+       label: 'Mark as Junk',
+       accessKey: 'J',
+       popup: null,
+       callback: markAsJunk
      },
      {
        label: 'Mark as Legitimate',
@@ -777,6 +816,14 @@ function pluginMain() {
       return
     }
  
+    var junkScore = msgHdr.getStringProperty("junkscore");
+    var isJunk = (junkScore == Components.interfaces.nsIJunkMailPlugin.IS_SPAM_SCORE);
+
+    // If already marked as Junk, don't do any further processing
+    if (isJunk) {
+       return
+    }
+
     MsgHdrToMimeMessage(msgHdr, null, function (aMsgHdr, aMimeMsg) {
        // Update counters
       stats.inspectTotal++;

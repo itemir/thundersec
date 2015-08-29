@@ -13,3 +13,4 @@ pref("extensions.thundersec.custom_dnsbl", "dnsbl.example.com");
 
 // Advanced settings
 pref("extensions.thundersec.api_enabled", true);
+pref("extensions.thundersec.auto_junk__enabled", false);
