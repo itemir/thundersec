@@ -7,12 +7,17 @@
   <tabbox id="detailsTabs" selectedIndex="0">
     <tabs>
       <tab id='dnsblTab' label="DNSBL"/>
+      <tab id='surblTab' label="SURBL"/>
       <tab id='spfTab' label="SPF"/>
       <tab id='dkimTab' label="DKIM"/>
     </tabs>
     <tabpanels>
       <tabpanel>
         <groupbox id='dnsblWhitelistBox' align="center" orient="horizontal">
+        </groupbox>
+      </tabpanel>
+      <tabpanel>
+        <groupbox id='surblWhitelistBox' align="center" orient="horizontal">
         </groupbox>
       </tabpanel>
       <tabpanel>

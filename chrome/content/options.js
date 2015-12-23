@@ -28,6 +28,17 @@ function clearInput() {
    }
 }
 
+// Clears custom SURBL box
+function clearSURBLInput() {
+   var textField = document.getElementById("string.custom_surbl");
+   if (textField.value == "surbl.example.com") {
+       alert ('You can enter your SURBL servers of choice.\n\n' +
+              'If you want to add multiple sources, separate them with comma or space.\n\n' +
+              'Example: surbl.domain1.com, surrbl.domain2.com');
+       document.getElementById("string.custom_surbl").value = "";
+   }
+}
+
 // Enables and disables DNSBL entry box based on checkbox
 function enableCustomDNSBL(item) {
    var textField = document.getElementById("string.custom_dnsbl");
@@ -37,6 +48,18 @@ function enableCustomDNSBL(item) {
    }
    else {
        document.getElementById("string.custom_dnsbl").removeAttribute("disabled");
+   } 
+}
+
+// Enables and disables custom SURBL entry box based on checkbox
+function enableCustomSURBL(item) {
+   var textField = document.getElementById("string.custom_surbl");
+   // .checked is updated after this event fires, so actions are pro-active
+   if (item.checked) {
+       document.getElementById("string.custom_surbl").setAttribute("disabled", true);
+   }
+   else {
+       document.getElementById("string.custom_surbl").removeAttribute("disabled");
    } 
 }
 
@@ -56,6 +79,7 @@ function clearWhitelist() {
           function onConnection(conn) {
               conn.execute("BEGIN IMMEDIATE TRANSACTION");
               conn.execute ("DELETE FROM dnsblWhiteList;");
+              conn.execute ("DELETE FROM surblWhiteList;");
               conn.execute ("DELETE FROM spfWhiteList;");
               conn.execute ("DELETE FROM dkimWhiteList;");
               conn.execute("COMMIT TRANSACTION");

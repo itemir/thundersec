@@ -23,11 +23,54 @@ function sanitizeInput (inputText) {
    return (returnText);
 }
 
+function updateSURBLtab(surbl) {
+   var host;
+   var code;
+
+   if ( surbl.length > 0 ) {
+       document.getElementById("surblTab").label = "SURBL (" + surbl.length + ")";
+       document.getElementById("detailsTabs").selectedIndex = 1;
+   }
+
+   var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
+   if (surbl.length > 0) {
+       html = html + "<span style='font-size: 12pt; color: #9a0000; font-weight: bold;'>";
+       if (surbl.length == 1) {
+           html = html + surbl.length + " SURBL violation";
+       }
+       else {
+           html = html + surbl.length + " SURBL violations";
+       }
+       html = html + "</span>";
+       html = html + "<table style='width: 400px; padding-top: 10px;'>";
+       html = html + "<tr><td style='font-weight: bold;'>Host</td><td style='font-weight: bold;'>Return Code</td><td style='font-weight: bold;'>Service</td></tr>";
+       for (var i in surbl) {
+           host = sanitizeInput (surbl[i].host);
+           code = sanitizeInput (surbl[i].code);
+           service = sanitizeInput (surbl[i].service);
+           html = html + "<tr><td>" + host + "</td><td>" + code + "</td><td>" + service + "</td></tr>";
+       }   
+       html = html + "</table>";
+   }
+   else {
+       html = html + "<p>No SURBL violations.</p>";
+   }
+   html = html + "</div>";
+
+   let container = document.getElementById("surblBox");
+   let divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input 
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
 function updateDNSBLtab(dnsbl) {
    var ip;
    var code;
-   var ipLink;
-   var codeLink;
 
    if ( dnsbl.length > 0 ) {
        document.getElementById("dnsblTab").label = "DNSBL (" + dnsbl.length + ")";
@@ -73,7 +116,7 @@ function updateDNSBLtab(dnsbl) {
 function updateSPFtab(spf) {
    if ( !spf.pass ) {
        document.getElementById("spfTab").label = "SPF (1)";
-       document.getElementById("detailsTabs").selectedIndex = 1;
+       document.getElementById("detailsTabs").selectedIndex = 2;
    }
 
    var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
@@ -107,7 +150,7 @@ function updateSPFtab(spf) {
 function updateDKIMtab(dkim) {
    if ( !dkim.pass ) {
        document.getElementById("dkimTab").label = "DKIM (1)";
-       document.getElementById("detailsTabs").selectedIndex = 2;
+       document.getElementById("detailsTabs").selectedIndex = 3;
    }
 
    var html = "<div style='width: 420px; font-size: 10pt; text-align: center; padding: 20px; -moz-user-select: text;'>";
@@ -139,6 +182,7 @@ function updateDKIMtab(dkim) {
 
 function updateDetails() {
    var DNSBL = window.arguments[0].dnsbl;
+   var SURBL = window.arguments[0].surbl;
    var SPF = window.arguments[0].spf;
    var DKIM = window.arguments[0].dkim;
 
@@ -146,4 +190,5 @@ function updateDetails() {
    updateDKIMtab(DKIM);
    updateSPFtab(SPF);
    updateDNSBLtab(DNSBL);
+   updateSURBLtab(SURBL);
 }

@@ -16,12 +16,19 @@
       <preference id="custom_dnsbl_enabled" name="extensions.thundersec.custom_dnsbl_enabled" type="bool"/>
       <preference id="custom_dnsbl" name="extensions.thundersec.custom_dnsbl" type="string"/>
 
+      <preference id="multi.uribl.com" name="extensions.thundersec.multi.uribl.com" type="bool"/>
+      <preference id="multi.surbl.org" name="extensions.thundersec.multi.surbl.org" type="bool"/>
+      <preference id="custom_surbl_enabled" name="extensions.thundersec.custom_surbl_enabled" type="bool"/>
+      <preference id="custom_surbl" name="extensions.thundersec.custom_surbl" type="string"/>
+
       <preference id="auto_junk_enabled" name="extensions.thundersec.auto_junk_enabled" type="bool"/>
+      <preference id="display_clean_message" name="extensions.thundersec.display_clean_message" type="bool"/>
       <preference id="api_enabled" name="extensions.thundersec.api_enabled" type="bool"/>
     </preferences>
     <tabbox id="optionsTabs" selectedIndex="0">
       <tabs>
         <tab label="DNSBL Services"/>
+        <tab label="SURBL Services"/>
         <tab label="Advanced"/>
       </tabs>
       <tabpanels>
@@ -45,8 +52,23 @@
           </hbox>
         </tabpanel>
         <tabpanel>
+          <hbox>
+            <vbox>
+              <checkbox id="checkbool.multi.uribl.com" preference="multi.uribl.com" label="multi.uribl.com" />
+              <hbox>
+                 <checkbox id="checkbool.custom_surbl_enabled" preference="custom_surbl_enabled" label="" onclick="enableCustomSURBL(this);" />
+                 <textbox id="string.custom_surbl" preference="custom_surbl" onclick="clearSURBLInput();"/>
+              </hbox>
+            </vbox>
+            <vbox>
+              <checkbox id="checkbool.multi.surbl.org" preference="multi.surbl.org" label="multi.surbl.org" />
+            </vbox>
+          </hbox>
+        </tabpanel>
+        <tabpanel>
            <vbox style='width: 100%;'>
              <checkbox id="checkbool.auto_junk_enabled" preference="auto_junk_enabled" label="Automatically mark messages as Junk if they fail DNSBL, DKIM or SPF checks." />
+             <checkbox id="checkbool.display_clean_message" preference="display_clean_message" label="Display notification even if no violations found." />
              <checkbox id="checkbool.api_enabled" preference="api_enabled" label="Send sanitized information to the cloud for improved results." />
              <separator/>
              <hbox pack='center'>
@@ -63,6 +85,11 @@
           document.getElementById("string.custom_dnsbl").removeAttribute("disabled");
       } else {
           document.getElementById("string.custom_dnsbl").setAttribute("disabled", true);
+      }
+      if ( document.getElementById("checkbool.custom_surbl_enabled").checked ) {
+          document.getElementById("string.custom_surbl").removeAttribute("disabled");
+      } else {
+          document.getElementById("string.custom_surbl").setAttribute("disabled", true);
       }
   </script>
 </prefwindow>

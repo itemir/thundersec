@@ -19,6 +19,7 @@
 
 // Global variables
 var DNSBL = {};
+var SURBL = {};
 var SPF = {};
 var DKIM = {};
 var stats = { periodStart: Date.now() / 1000,
@@ -27,6 +28,9 @@ var stats = { periodStart: Date.now() / 1000,
               dnsblLookup: 0,
               dnsblViolation: 0,
               dnsblWhitelist: 0,
+              surblLookup: 0,
+              surblViolation: 0,
+              surblWhitelist: 0,
               spfViolation: 0,
               spfWhitelist:0,
               dkimViolation: 0,
@@ -101,6 +105,15 @@ function initialize() {
                    }
                ); 
 
+               conn.tableExists("surblWhiteList").then(
+                   function (exists) {
+                       if (!exists) {
+                           // This means, database has just been created. Create the table.
+                           createSurblTable (conn);
+                       }
+                   }
+               ); 
+
                conn.tableExists("spfWhiteList").then(
                    function (exists) {
                        if (!exists) {
@@ -169,6 +182,9 @@ function apiSendGenericStats() {
                       dnsblLookup: 0,
                       dnsblViolation: 0,
                       dnsblWhitelist: 0,
+                      surblLookup: 0,
+                      surblViolation: 0,
+                      surblWhitelist: 0,
                       spfViolation: 0,
                       spfWhitelist:0,
                       dkimViolation: 0,
@@ -185,6 +201,18 @@ function createDnsblTable(connection) {
 	      "   'code'	TEXT NOT NULL," +
 	      "	  'sender'	TEXT NOT NULL," +
               "   UNIQUE(ipAddress, dnsblSource, code, sender) ); ";
+
+    connection.execute (sql);
+}
+
+function createSurblTable(connection) {
+    let sql = " CREATE TABLE 'surblWhiteList' ( " +
+              "   'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+    	      "	  'host'	TEXT NOT NULL," +
+	      "   'surblSource'	TEXT NOT NULL," +
+	      "   'code'	TEXT NOT NULL," +
+	      "	  'sender'	TEXT NOT NULL," +
+              "   UNIQUE(host, surblSource, code, sender) ); ";
 
     connection.execute (sql);
 }
@@ -229,6 +257,24 @@ function apiSendDnsblStats (ip, code, source) {
 
 // Notify the API for crowd-sourced improvements
 // This should not send any sensitive information back
+function apiSendSurblStats (host, code, source) {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.thundersec.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        $.post( API_URL + 'surbl/stat',
+               { 'host': host,
+                 'code': code,
+                 'surbl': source,
+                 'version': VERSION } );
+    }
+}
+
+// Notify the API for crowd-sourced improvements
+// This should not send any sensitive information back
 function apiSendWhiteList(ip, code, source,sender) {
     var pref = Components.classes["@mozilla.org/preferences-service;1"]
                      .getService(Components.interfaces.nsIPrefService)
@@ -243,6 +289,27 @@ function apiSendWhiteList(ip, code, source,sender) {
                { 'ip': ip,
                  'code': code,
                  'dnsbl': source,
+                 'senderHash': sha256Hash,
+                 'version': VERSION } );
+    }
+}
+
+// Notify the API for crowd-sourced improvements
+// This should not send any sensitive information back
+function apiSurblSendWhiteList(host, code, source, sender) {
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                     .getService(Components.interfaces.nsIPrefService)
+                     .getBranch("extensions.thundersec.");
+
+    // Check if API usage is allowed in preferences
+    if ( pref.getBoolPref('api_enabled') ) {
+        // We will hash the sender for privacy
+        // We use SHA256 hash, it is a way one way hash (i.e. you cannnot go back from hash to email)
+        let sha256Hash = CryptoJS.SHA256 (sender).toString(CryptoJS.enc.Hex);
+        $.post( API_URL + 'surbl/whitelist',
+               { 'host': host,
+                 'code': code,
+                 'surbl': source,
                  'senderHash': sha256Hash,
                  'version': VERSION } );
     }
@@ -318,7 +385,7 @@ function parseReceivedLine (receivedLine) {
    return addr;
 }
 
-function updateWhiteList(dnsbl, spf, dkim) {
+function updateWhiteList(dnsbl, surbl, spf, dkim) {
     connection.execute("BEGIN IMMEDIATE TRANSACTION");
     for (var i in dnsbl) {
         let values = [ dnsbl[i].ip,
@@ -335,6 +402,22 @@ function updateWhiteList(dnsbl, spf, dkim) {
                          dnsbl[i].code,
                          dnsbl[i].service,
                          dnsbl[i].sender);
+    }
+    for (var i in surbl) {
+        let values = [ surbl[i].host,
+                       surbl[i].service, 
+                       surbl[i].code,
+                       surbl[i].sender ];
+        let sql = "INSERT OR IGNORE INTO surblWhiteList " +
+                  "('host', 'surblSource', 'code', 'sender') " +
+                  "VALUES (?, ?, ?, ?)";
+        connection.execute(sql, values);
+
+        // Notify the API for crowd-sourced improvements
+        apiSurblSendWhiteList(surbl[i].host, 
+                         surbl[i].code,
+                         surbl[i].service,
+                         surbl[i].sender);
     }
     if (!spf.pass) {
         let values = [ spf.reason, spf.sender ];
@@ -365,7 +448,7 @@ function markAsLegitimate(notf, desc) {
                                   "reason in the future.");
     if (confirm) {
         // We need to pass the DNSBL here, otherwise it will be reset before the database is processed
-        updateWhiteList( DNSBL[currentMailID], SPF[currentMailID], DKIM[currentMailID] );
+        updateWhiteList( DNSBL[currentMailID], SURBL[currentMailID], SPF[currentMailID], DKIM[currentMailID] );
     } else {
         throw new Error('Preventing notification bar from closing.'); 
     }
@@ -373,6 +456,7 @@ function markAsLegitimate(notf, desc) {
 
 function detailsBox(notf, desc) {
     var params = { dnsbl: DNSBL[currentMailID],
+                   surbl: SURBL[currentMailID],
                    dkim: DKIM[currentMailID],
                    spf: SPF[currentMailID] };
 
@@ -387,6 +471,65 @@ function optionsBox(notf, desc) {
     var features = "chrome,titlebar,toolbar,centerscreen,dialog=yes";
     window.openDialog("chrome://thundersec/content/options.xul", "Preferences", features);
     throw new Error('Preventing notification bar from closing.');
+}
+
+function cleanMessageNotification(mailID) {
+   if (mailID != currentMailID) {
+       // User has moved on, don't update the notificationbox
+       return;
+   }
+
+   // This feels redundant but necessary
+   let msgHdr = gFolderDisplay.selectedMessage;
+
+   if (!msgHdr) {
+       return
+   }
+
+   var junkScore = msgHdr.getStringProperty("junkscore");
+   var isJunk = (junkScore == Components.interfaces.nsIJunkMailPlugin.IS_SPAM_SCORE);
+
+   // If already marked as Junk, don't display the banner
+   if (isJunk) {
+       return
+   }
+
+   var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefService)
+                        .getBranch("extensions.thundersec.");
+
+   // Check if auto-junk feature is enabled
+   if ( !pref.getBoolPref('display_clean_message') ) { 
+       return
+   }
+
+   var buttons = [
+     {
+       label: 'Preferences',
+       accessKey: 'P',
+       popup: null,
+       callback: optionsBox
+     },
+   ];
+
+   let notificationBox = document.getElementById("msgNotificationBar");
+
+   if ( notificationBox.getNotificationWithValue( 'noSecurityViolations' ) ) {
+       // 'noSecurityViolations' notification is already up, no need to repeat
+       return;
+   }
+
+   if ( notificationBox.getNotificationWithValue( 'securityViolations' ) ) {
+      // Pass if 'securityViolations' notification is up, it has priority
+      return;
+   }
+
+   let notificationText = "No DNSBL, SURBL, SPF or DKIM violations.";
+   notificationBox.appendNotification(notificationText,
+                                      "noSecurityViolations",
+                                      null,
+                                      1,
+                                      buttons);
 }
 
 function updateNotification(mailID) {
@@ -450,19 +593,29 @@ function updateNotification(mailID) {
    ];
 
    let notificationBox = document.getElementById("msgNotificationBar");
-   if ( notificationBox.getNotificationWithValue( 'dnsbl' ) ) {
+   // Remove 'noSecurityViolations' bar if it exists, it is not relevant
+   while ( notificationBox.getNotificationWithValue( 'noSecurityViolations' ) ) {
+       notificationBox.removeCurrentNotification();
+   }
+   while ( notificationBox.getNotificationWithValue( 'securityViolations' ) ) {
        notificationBox.removeCurrentNotification();
    }
 
-
    let violations = [];
    let plural = false;
-
    if ( DNSBL[currentMailID].length == 1 ) { 
        violations.push ("DNSBL");
    }
    else if ( DNSBL[currentMailID].length > 1 ) {
        violations.push ("Multiple DNSBL");
+       plural = true;
+   }
+
+   if ( SURBL[currentMailID].length == 1 ) { 
+       violations.push ("SURBL");
+   }
+   else if ( SURBL[currentMailID].length > 1 ) {
+       violations.push ("Multiple SURBL");
        plural = true;
    }
 
@@ -475,7 +628,7 @@ function updateNotification(mailID) {
    }
 
    let notificationText = '';
-   
+  
    if ( violations.length == 1 ) {
        if (plural) {
            notificationText = notificationText + 
@@ -497,11 +650,18 @@ function updateNotification(mailID) {
                           violations[1] + ' and ' +  
                           violations[2] + ' violations. ';
    }
+   if ( violations.length == 4 ) {
+       notificationText = notificationText + 
+                          violations[0] + ', ' +  
+                          violations[1] + ', ' +  
+                          violations[2] + ' and ' +  
+                          violations[3] + ' violations. ';
+   }
 
    notificationText = notificationText + "Please check Details for more information."
 
    notificationBox.appendNotification(notificationText,
-                                      "dnsbl",
+                                      "securityViolations",
                                       null,
                                       10,
                                       buttons);
@@ -518,7 +678,7 @@ function updateDNSBLinfo(mailID) {
     var imgSpinner = document.getElementById("imgSpinner");
     var label;
     if (numLookups != 0) { 
-        label = "Number of outstanding DNSBL lookups: " + numLookups;
+        label = "Number of outstanding DNS lookups: " + numLookups;
         imgSpinner.hidden = false;
     }
     else {
@@ -528,6 +688,102 @@ function updateDNSBLinfo(mailID) {
     dnsblInfo.label = label;
 }
     
+function doSURBLcheck(hosts, surblService, returnPath, mailID) {
+    var match;
+    var numDNSLookups = 0;
+    var numSQLLookups = 0;
+    var safeMail = true;
+
+    let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]
+                     .createInstance(Components.interfaces.nsIDNSService);
+
+    let Thread = Components.classes["@mozilla.org/thread-manager;1"]
+                 .getService(Components.interfaces.nsIThreadManager).currentThread;
+
+    for (var i in hosts) {
+        let surblQuery;
+        let host;
+        let resolvedAddr;
+
+        let Listener = {
+             onLookupComplete: function(request, record, status) {
+               numDNSLookups--;
+               totalDNSlookups[mailID]--;
+               updateDNSBLinfo(mailID);
+
+               if (Components.isSuccessCode(status)) {
+                   while ( record && record.hasMore() ) {
+                       // Update stats
+                       stats.surblViolation++;
+
+                       resolvedAddr = record.getNextAddrAsString();
+                       if ( resolvedAddr != '127.0.0.1') {
+                           // This query HAS TO return only a single row
+                           let sql = "SELECT COUNT(id) as cnt FROM surblWhiteList " +
+                                     "WHERE host=? AND surblSource=? AND code=? AND sender=?";
+                           let values = [ host,
+                                          surblService,
+                                          resolvedAddr,
+                                          returnPath ];
+                           numSQLLookups++;
+                           connection.execute(sql, values, function(row) {
+                               numSQLLookups--;
+
+                               // This will be 1 for existing records, 0 for non-existent ones
+                               let count = row.getResultByName('cnt');
+                               if (!count) { 
+                                   SURBL[mailID].push ( { host: host,
+    			              		          service: surblService, 
+                                                          code: resolvedAddr,
+                                                          sender: returnPath } );
+                                   apiSendSurblStats (host, resolvedAddr, surblService);
+                                   safeMail = false;
+                               } else {
+                                   // Previously white listed
+                                   // Update stats
+                                   stats.surblWhitelist++;
+                               }
+                               // Make sure we finished all lookups, both DNS and SQL
+                               if ( numSQLLookups == 0 ) {
+                                   if (safeMail) {
+                                       // Pass
+                                       if (DKIM[mailID].pass && SPF[mailID].pass && (DNSBL[mailID].length == 0)) {
+                                           cleanMessageNotification(mailID);
+                                       }
+                                   } else {
+                                       updateNotification (mailID);
+                                   }
+                               }
+                            });
+                       } // If resolvedAddress != '127.0.0.1'
+                   }
+               }
+               else {
+                   // No response from DNS DNSBL safe
+                   if (DKIM[mailID].pass && SPF[mailID].pass && (DNSBL[mailID].length == 0)) {
+                       cleanMessageNotification(mailID);
+                   }
+               }
+
+            }
+        };
+
+        host = hosts[i];
+
+        surblQuery = host + "." + surblService + ".";
+
+        // Update stats
+        stats.surblLookup++;
+
+        numDNSLookups++;
+
+        totalDNSlookups[mailID]++;
+        updateDNSBLinfo(mailID);
+
+        DnsService.asyncResolve(surblQuery, 0, Listener, Thread);
+    }
+}
+
 function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
     var match;
     var reverseAddr;
@@ -586,9 +842,12 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
                            // Make sure we finished all lookups, both DNS and SQL
                            if ( numSQLLookups == 0 ) {
                                if (safeMail) {
-                                    // Pass
+                                   // Pass
+                                   if (DKIM[mailID].pass && SPF[mailID].pass && (SURBL[mailID].length == 0)) {
+                                       cleanMessageNotification(mailID);
+                                   }
                                } else {
-                                   updateNotification (mailID)
+                                   updateNotification (mailID);
                                }
                            }
                        });
@@ -596,6 +855,9 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
                }
                else {
                    // No response from DNS DNSBL safe
+                   if (DKIM[mailID].pass && SPF[mailID].pass && (SURBL[mailID].length == 0)) {
+                       cleanMessageNotification(mailID);
+                   }
                }
 
             }
@@ -619,6 +881,9 @@ function doDNSBLcheck(relays, dnsblService, returnPath, mailID) {
            DnsService.asyncResolve(dnsblQuery, 0, Listener, Thread);
        
         }
+    }
+    if (!numDNSLookups && DKIM[mailID].pass && SPF[mailID].pass && (SURBL[mailID].length == 0)) {
+        cleanMessageNotification(mailID);
     }
 }
 
@@ -645,6 +910,33 @@ function mydump(arr,level) {
         dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
     }
     return dumped_text;
+}
+
+// Perform all SURBL checks by calling doSURBLcheck iteratively
+function doSURBLchecks(hosts, returnPath, mailID) {
+    var surblServices = [ 'multi.uribl.com',
+                          'multi.surbl.org' ];
+
+    var pref = Components.classes["@mozilla.org/preferences-service;1"]
+                         .getService(Components.interfaces.nsIPrefService)
+                         .getBranch("extensions.thundersec.");
+
+    // Do this for each of the SURBL services
+    for (var i in surblServices) {
+        // Check if enabled in preferences
+        if ( pref.getBoolPref(surblServices[i]) ){
+            doSURBLcheck (hosts, surblServices[i], returnPath, mailID);
+        }
+    }
+
+    // Process Custom SURBL if it is enabled
+    if ( pref.getBoolPref('custom_surbl_enabled') && pref.getCharPref('custom_surbl') ) {
+        var customSURBLs = pref.getCharPref('custom_surbl').split(/\s*\,\s*|\s+/);
+        for (var i in customSURBLs) {
+            doSURBLcheck (hosts, customSURBLs[i], returnPath, mailID);
+        }
+    }
+
 }
 
 // Perform all DNSBL checks by calling doDNSBLcheck iteratively
@@ -799,6 +1091,8 @@ function pluginMain() {
 
     // Initialize DNSBL
     DNSBL[mailID] = [];
+    // Initialize SURBL
+    SURBL[mailID] = [];
 
     // Initialize totalDNSlookups
     if (!totalDNSlookups[mailID]) {
@@ -830,6 +1124,7 @@ function pluginMain() {
 			 
       var relay = null;
       var relays = [];
+      var urlHosts = [];
       var addr;
       var numDNSLookups = 0;
       var temp = 0;
@@ -871,6 +1166,35 @@ function pluginMain() {
       } else {
           SPF[mailID] = { pass: true, reason: null, sender: null };
       }
+
+      // SURBL START
+      // Extract hostnames from URLs in e-mail body
+      let body = aMimeMsg.prettyString(true, undefined, true);
+      let urlMatch = body.match(/(www\.[^\/\s'"\(\)<>]+)/g);
+      if (urlMatch) {
+          for (let i in urlMatch) {
+              // Eliminate http://, https:// and www.
+              let url = urlMatch[i].replace(/^https?:\/\//,'');
+              url = url.replace(/^www\./,'');
+              if ( urlHosts.indexOf(url) == -1 ) {
+                  urlHosts.push(url);
+              }
+          }
+      }
+      urlMatch = body.match(/https?:\/\/([^\/\s'"\(\)<>]+)/g);
+      if (urlMatch) {
+          for (let i in urlMatch) {
+              // Eliminate http://, https:// and www.
+              let url = urlMatch[i].replace(/^https?:\/\//,'');
+              url = url.replace(/^www\./,'');
+              if ( urlHosts.indexOf(url) == -1 ) {
+                  urlHosts.push(url);
+              }
+          }
+      }
+
+      doSURBLchecks (urlHosts, returnPath, mailID);
+      // SURBL STOP
 
       let DnsService = Components.classes["@mozilla.org/network/dns-service;1"]
                       .createInstance(Components.interfaces.nsIDNSService);

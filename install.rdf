@@ -4,7 +4,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:type>2</em:type> <!-- 2 : Extension -->
         <em:id>thundersec@community</em:id>
-        <em:version>1.1</em:version>
+        <em:version>2.0b</em:version>
         <em:name>ThunderSec</em:name>
         <em:description>Provides security features for Mozilla Thunderbird. These include DNSBL and RBL support, DKIM and SPF failure verifications. DNSBL support can be used to leverage Spamhaus, Abuse.ch and other DNSBL/RBL databases, including custom ones.</em:description>
         <em:iconURL>chrome://thundersec/content/images/thundersec.png</em:iconURL>

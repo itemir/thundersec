@@ -97,6 +97,80 @@ function queryDnsblWhitelist(conn) {
    );
 }
 
+function updateSurblWhitelist(whitelist) {
+   var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
+   
+   if (whitelist.length) {
+       html = html + "<table style='width: 100%; padding-top: 10px;'>";
+       html = html + "<tr><td style='font-weight: bold;'>Domain</td>" +
+                     "<td style='font-weight: bold;'>Service</td>" +
+                     "<td style='font-weight: bold;'>Code</td>" + 
+                     "<td style='font-weight: bold;'>Sender</td></tr>";
+    
+       for (var i in whitelist) {
+           let host = sanitizeInput (whitelist[i].host); 
+           let source = sanitizeInput (whitelist[i].source); 
+           let code = sanitizeInput (whitelist[i].code); 
+           let sender = sanitizeInput (whitelist[i].sender); 
+    
+           html = html + "<tr><td style='padding: 5px;'>" + host + 
+                         "</td><td style='padding: 5px;'>" + source + 
+                         "</td><td style='padding: 5px;'>" + code + 
+                         "</td><td style='padding: 5px;'>" + sender + 
+                         "</td></tr>";
+       }   
+
+       html = html + "</table>";
+   } else {
+       html = html + "<p style='text-align: center; padding-top: 60px; font-size: 10pt;'>";
+       html = html + "SURBL whitelist is empty";
+       html = html + "</p>";
+   }
+
+   html = html + "</div>";
+
+   var container = document.getElementById("surblWhitelistBox");
+   var divHTML = document.createElementNS("http://www.w3.org/1999/xhtml","div");
+
+   // Updating innerHTML dynamically causes security warnings in Mozilla Add-on validator 
+   // If you are here for such warning, please review above how this value is generated
+   // 'html' is a combination of safe static html and sanitized input
+   divHTML.innerHTML = html;
+
+   container.appendChild(divHTML);
+}
+
+function querySurblWhitelist(conn) {
+   var whiteList = [];
+
+   conn.tableExists("surblWhiteList").then(
+       function (exists) {
+           let sql = 'SELECT * FROM surblWhiteList';
+           conn.execute (sql, null, function(row) {
+              let host = row.getResultByName('host');
+              let source = row.getResultByName('surblSource');
+              let code = row.getResultByName('code');
+              let sender = row.getResultByName('sender');
+
+              whiteList.push ( { host: host,
+                                 source: source,
+                                 code: code,
+                                 sender: sender } );
+           }).then(
+              function onStatementComplete(result) {
+                  if (whiteList.length) {
+                      document.getElementById("surblTab").label = "SURBL (" + whiteList.length + ")";
+                  }
+                  updateSurblWhitelist(whiteList);
+              },
+              function onError(err) {
+                  alert ('SQL query failed: ' + err);
+              }
+           );
+       }
+   );
+}
+
 function updateSpfWhitelist(whitelist) {
    var html = "<div style='width: 500px; height: 350px; overflow: scroll; margin: auto;'>";
    
@@ -233,6 +307,7 @@ function viewWhitelist() {
    ).then(
        function onConnection(conn) {
            queryDnsblWhitelist(conn);
+           querySurblWhitelist(conn);
            querySpfWhitelist(conn);
            queryDkimWhitelist(conn);
            // Give a second then close the connection
