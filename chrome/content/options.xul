@@ -67,7 +67,7 @@
         </tabpanel>
         <tabpanel>
            <vbox style='width: 100%;'>
-             <checkbox id="checkbool.auto_junk_enabled" preference="auto_junk_enabled" label="Automatically mark messages as Junk if they fail DNSBL, DKIM or SPF checks." />
+             <checkbox id="checkbool.auto_junk_enabled" preference="auto_junk_enabled" label="Automatically mark messages as Junk if they fail any security check." />
              <checkbox id="checkbool.display_clean_message" preference="display_clean_message" label="Display notification even if no violations found." />
              <checkbox id="checkbool.api_enabled" preference="api_enabled" label="Send sanitized information to the cloud for improved results." />
              <separator/>
