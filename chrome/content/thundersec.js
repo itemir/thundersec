@@ -1170,7 +1170,7 @@ function pluginMain() {
       // SURBL START
       // Extract hostnames from URLs in e-mail body
       let body = aMimeMsg.prettyString(true, undefined, true);
-      let urlMatch = body.match(/(www\.[^\/\s'"\(\)<>]+)/g);
+      let urlMatch = body.match(/(www\.[a-zA-Z0-9\.\-_]+)/g);
       if (urlMatch) {
           for (let i in urlMatch) {
               // Eliminate http://, https:// and www.
@@ -1181,7 +1181,7 @@ function pluginMain() {
               }
           }
       }
-      urlMatch = body.match(/https?:\/\/([^\/\s'"\(\)<>]+)/g);
+      urlMatch = body.match(/https?:\/\/([a-zA-Z0-9\.\-_]+)/g);
       if (urlMatch) {
           for (let i in urlMatch) {
               // Eliminate http://, https:// and www.

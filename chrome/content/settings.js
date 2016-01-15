@@ -21,6 +21,6 @@
 
 const DB_NAME = 'thundersec.sqlite';
 const API_URL = 'https://www.ilkertemir.com/thundersec/api/v1/';
-const VERSION = '2.0';
+const VERSION = '2.0.1';
 // Send generic stats every two hours
 const STAT_INTERVAL = 2*60*60*1000;
